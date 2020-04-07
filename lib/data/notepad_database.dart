@@ -6,6 +6,7 @@ class Notes extends Table {
   IntColumn get id => integer().autoIncrement()();
   BlobColumn get bitmap => blob().nullable()();
   TextColumn get noteText => text().withLength(min: 1, max: 2048)();
+  TextColumn get noteTitle => text().withLength(min: 1, max: 256).nullable()();
 }
 
 @UseMoor(tables: [Notes])

@@ -1,4 +1,5 @@
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
+import 'package:drawablenotepadflutter/routes/list/views/note_item.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,13 +26,10 @@ class NotesListState extends State<NotesList> {
             itemCount: notes.length,
             itemBuilder: (_, index) {
               final itemNote = notes[index];
-              return _buildNoteItem(itemNote);
+              return NoteItem(note: itemNote);
             });
       },
     );
   }
 
-  Widget _buildNoteItem(Note itemNote) {
-    return Text(itemNote.noteText); //TODO
-  }
 }
