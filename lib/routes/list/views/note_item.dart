@@ -67,7 +67,7 @@ class NoteItemState extends State<NoteItem> {
               SizedBox(height: 4.0),
               Row(
                 children: [
-                  Text(getDateTimeAsNonNerdText(note.noteDate),
+                  Text(_getDateTimeAsNonNerdText(note.noteDate),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(color: Colors.grey[700])),
@@ -111,7 +111,7 @@ class NoteItemState extends State<NoteItem> {
     }
   }
 
-  String getDateTimeAsNonNerdText(DateTime dateTime) {
+  String _getDateTimeAsNonNerdText(DateTime dateTime) {
     var now = new DateTime.now();
 
     int diffDays = now.difference(dateTime).inDays;
