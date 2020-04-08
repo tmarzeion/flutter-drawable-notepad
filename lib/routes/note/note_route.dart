@@ -49,7 +49,7 @@ class _NoteRouteState extends State<NoteRoute> {
     final database = Provider.of<NotepadDatabase>(context, listen: false);
     final noteText = noteTextController.text;
     if (noteText.isNotEmpty) {
-      database.insertNote(Note(noteText: noteText));
+      database.insertNote(Note(noteText: noteText, noteDate: new DateTime.now()));
     }
     return true;
   }

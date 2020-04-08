@@ -11,26 +11,27 @@ class Note extends DataClass implements Insertable<Note> {
   final int id;
   final Uint8List bitmap;
   final String noteText;
-  final String noteTitle;
+  final DateTime noteDate;
   Note(
       {@required this.id,
       this.bitmap,
       @required this.noteText,
-      this.noteTitle});
+      @required this.noteDate});
   factory Note.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
     final intType = db.typeSystem.forDartType<int>();
     final uint8ListType = db.typeSystem.forDartType<Uint8List>();
     final stringType = db.typeSystem.forDartType<String>();
+    final dateTimeType = db.typeSystem.forDartType<DateTime>();
     return Note(
       id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
       bitmap: uint8ListType
           .mapFromDatabaseResponse(data['${effectivePrefix}bitmap']),
       noteText: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}note_text']),
-      noteTitle: stringType
-          .mapFromDatabaseResponse(data['${effectivePrefix}note_title']),
+      noteDate: dateTimeType
+          .mapFromDatabaseResponse(data['${effectivePrefix}note_date']),
     );
   }
   factory Note.fromJson(Map<String, dynamic> json,
@@ -40,7 +41,7 @@ class Note extends DataClass implements Insertable<Note> {
       id: serializer.fromJson<int>(json['id']),
       bitmap: serializer.fromJson<Uint8List>(json['bitmap']),
       noteText: serializer.fromJson<String>(json['noteText']),
-      noteTitle: serializer.fromJson<String>(json['noteTitle']),
+      noteDate: serializer.fromJson<DateTime>(json['noteDate']),
     );
   }
   @override
@@ -50,7 +51,7 @@ class Note extends DataClass implements Insertable<Note> {
       'id': serializer.toJson<int>(id),
       'bitmap': serializer.toJson<Uint8List>(bitmap),
       'noteText': serializer.toJson<String>(noteText),
-      'noteTitle': serializer.toJson<String>(noteTitle),
+      'noteDate': serializer.toJson<DateTime>(noteDate),
     };
   }
 
@@ -63,19 +64,19 @@ class Note extends DataClass implements Insertable<Note> {
       noteText: noteText == null && nullToAbsent
           ? const Value.absent()
           : Value(noteText),
-      noteTitle: noteTitle == null && nullToAbsent
+      noteDate: noteDate == null && nullToAbsent
           ? const Value.absent()
-          : Value(noteTitle),
+          : Value(noteDate),
     );
   }
 
   Note copyWith(
-          {int id, Uint8List bitmap, String noteText, String noteTitle}) =>
+          {int id, Uint8List bitmap, String noteText, DateTime noteDate}) =>
       Note(
         id: id ?? this.id,
         bitmap: bitmap ?? this.bitmap,
         noteText: noteText ?? this.noteText,
-        noteTitle: noteTitle ?? this.noteTitle,
+        noteDate: noteDate ?? this.noteDate,
       );
   @override
   String toString() {
@@ -83,14 +84,14 @@ class Note extends DataClass implements Insertable<Note> {
           ..write('id: $id, ')
           ..write('bitmap: $bitmap, ')
           ..write('noteText: $noteText, ')
-          ..write('noteTitle: $noteTitle')
+          ..write('noteDate: $noteDate')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode => $mrjf($mrjc(id.hashCode,
-      $mrjc(bitmap.hashCode, $mrjc(noteText.hashCode, noteTitle.hashCode))));
+      $mrjc(bitmap.hashCode, $mrjc(noteText.hashCode, noteDate.hashCode))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
@@ -98,36 +99,37 @@ class Note extends DataClass implements Insertable<Note> {
           other.id == this.id &&
           other.bitmap == this.bitmap &&
           other.noteText == this.noteText &&
-          other.noteTitle == this.noteTitle);
+          other.noteDate == this.noteDate);
 }
 
 class NotesCompanion extends UpdateCompanion<Note> {
   final Value<int> id;
   final Value<Uint8List> bitmap;
   final Value<String> noteText;
-  final Value<String> noteTitle;
+  final Value<DateTime> noteDate;
   const NotesCompanion({
     this.id = const Value.absent(),
     this.bitmap = const Value.absent(),
     this.noteText = const Value.absent(),
-    this.noteTitle = const Value.absent(),
+    this.noteDate = const Value.absent(),
   });
   NotesCompanion.insert({
     this.id = const Value.absent(),
     this.bitmap = const Value.absent(),
     @required String noteText,
-    this.noteTitle = const Value.absent(),
-  }) : noteText = Value(noteText);
+    @required DateTime noteDate,
+  })  : noteText = Value(noteText),
+        noteDate = Value(noteDate);
   NotesCompanion copyWith(
       {Value<int> id,
       Value<Uint8List> bitmap,
       Value<String> noteText,
-      Value<String> noteTitle}) {
+      Value<DateTime> noteDate}) {
     return NotesCompanion(
       id: id ?? this.id,
       bitmap: bitmap ?? this.bitmap,
       noteText: noteText ?? this.noteText,
-      noteTitle: noteTitle ?? this.noteTitle,
+      noteDate: noteDate ?? this.noteDate,
     );
   }
 }
@@ -166,17 +168,20 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
         minTextLength: 1, maxTextLength: 2048);
   }
 
-  final VerificationMeta _noteTitleMeta = const VerificationMeta('noteTitle');
-  GeneratedTextColumn _noteTitle;
+  final VerificationMeta _noteDateMeta = const VerificationMeta('noteDate');
+  GeneratedDateTimeColumn _noteDate;
   @override
-  GeneratedTextColumn get noteTitle => _noteTitle ??= _constructNoteTitle();
-  GeneratedTextColumn _constructNoteTitle() {
-    return GeneratedTextColumn('note_title', $tableName, true,
-        minTextLength: 1, maxTextLength: 256);
+  GeneratedDateTimeColumn get noteDate => _noteDate ??= _constructNoteDate();
+  GeneratedDateTimeColumn _constructNoteDate() {
+    return GeneratedDateTimeColumn(
+      'note_date',
+      $tableName,
+      false,
+    );
   }
 
   @override
-  List<GeneratedColumn> get $columns => [id, bitmap, noteText, noteTitle];
+  List<GeneratedColumn> get $columns => [id, bitmap, noteText, noteDate];
   @override
   $NotesTable get asDslTable => this;
   @override
@@ -200,9 +205,11 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
     } else if (isInserting) {
       context.missing(_noteTextMeta);
     }
-    if (d.noteTitle.present) {
-      context.handle(_noteTitleMeta,
-          noteTitle.isAcceptableValue(d.noteTitle.value, _noteTitleMeta));
+    if (d.noteDate.present) {
+      context.handle(_noteDateMeta,
+          noteDate.isAcceptableValue(d.noteDate.value, _noteDateMeta));
+    } else if (isInserting) {
+      context.missing(_noteDateMeta);
     }
     return context;
   }
@@ -227,8 +234,8 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
     if (d.noteText.present) {
       map['note_text'] = Variable<String, StringType>(d.noteText.value);
     }
-    if (d.noteTitle.present) {
-      map['note_title'] = Variable<String, StringType>(d.noteTitle.value);
+    if (d.noteDate.present) {
+      map['note_date'] = Variable<DateTime, DateTimeType>(d.noteDate.value);
     }
     return map;
   }
