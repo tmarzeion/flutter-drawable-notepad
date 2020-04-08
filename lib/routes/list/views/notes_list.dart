@@ -22,14 +22,17 @@ class NotesListState extends State<NotesList> {
       stream: database.watchAllNotes(),
       builder: (context, AsyncSnapshot snapshot) {
         final notes = snapshot.data ?? List();
-        return ListView.builder(
-            itemCount: notes.length,
+        return ListView.separated(
             itemBuilder: (_, index) {
               final itemNote = notes[index];
               return NoteItem(note: itemNote);
-            });
+            },
+            separatorBuilder: (context, index) => Divider(
+              color: Colors.black,
+              height: 0.0,
+            ),
+            itemCount: notes.length);
       },
     );
   }
-
 }
