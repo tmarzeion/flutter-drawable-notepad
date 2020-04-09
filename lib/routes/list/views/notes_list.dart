@@ -30,7 +30,7 @@ class NotesListState extends State<NotesList> {
                   note: itemNote);
             },
             separatorBuilder: (context, index) => Divider(
-              color: Colors.black,
+              color: Colors.grey[600],
               height: 0.0,
             ),
             itemCount: notes.length);
