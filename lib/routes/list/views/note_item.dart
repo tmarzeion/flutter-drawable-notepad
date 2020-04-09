@@ -98,20 +98,23 @@ class NoteItemState extends State<NoteItem> {
   }
 
   String _getFirstLineOfText(String noteText) {
-    if (noteText.contains("\n")) {
-      return noteText.substring(0, noteText.indexOf("\n"));
-    } else {
-      return noteText;
+    List<String> lines = new LineSplitter().convert(noteText);
+    if (lines.isNotEmpty) {
+      for (var line in lines) {
+        if (isNotBlank(line)) {
+          return line;
+        }
+      }
     }
+    return "No title";
   }
 
   // Nullable
   String _getSecondLineOfText(String noteText) {
     List<String> lines = new LineSplitter().convert(noteText);
     if (lines.isNotEmpty) {
-      lines.removeAt(0); // Remove first line since its displayed as title
       for (var line in lines) {
-        if (isNotBlank(line)) {
+        if (isNotBlank(line) && line != _getFirstLineOfText(noteText)) {
           return line;
         }
       }
