@@ -5,7 +5,9 @@ import 'package:provider/provider.dart';
 import 'views/font_picker_menu_item.dart';
 
 class NoteRoute extends StatefulWidget {
-  NoteRoute({Key key}) : super(key: key);
+  NoteRoute({Key key, this.note}) : super(key: key);
+
+  Note note;
 
   @override
   _NoteRouteState createState() => _NoteRouteState();
@@ -13,6 +15,13 @@ class NoteRoute extends StatefulWidget {
 
 class _NoteRouteState extends State<NoteRoute> {
   final noteTextController = TextEditingController();
+
+
+  @override
+  void initState() {
+    noteTextController.text = widget.note?.noteText ?? "";
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +58,13 @@ class _NoteRouteState extends State<NoteRoute> {
     final database = Provider.of<NotepadDatabase>(context, listen: false);
     final noteText = noteTextController.text;
     if (noteText.isNotEmpty) {
-      database.insertNote(Note(noteText: noteText, noteDate: new DateTime.now()));
+      if (widget.note != null) {
+        if (widget.note.noteText != noteText) {
+          database.updateNote(widget.note.copyWith(noteText: noteText));
+        }
+      } else {
+        database.insertNote(Note(noteText: noteText, noteDate: new DateTime.now()));
+      }
     }
     return true;
   }

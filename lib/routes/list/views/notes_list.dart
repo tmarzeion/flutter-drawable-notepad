@@ -24,8 +24,10 @@ class NotesListState extends State<NotesList> {
         final notes = snapshot.data ?? List();
         return ListView.separated(
             itemBuilder: (_, index) {
-              final itemNote = notes[index];
-              return NoteItem(note: itemNote);
+              final itemNote = notes[snapshot.data.length - index - 1]; //TODO Ugly workaroud for reversing list order, IDK how to make that on Moor level
+              return NoteItem(
+                  key: ObjectKey(itemNote),
+                  note: itemNote);
             },
             separatorBuilder: (context, index) => Divider(
               color: Colors.black,

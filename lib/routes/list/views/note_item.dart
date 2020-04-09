@@ -1,11 +1,15 @@
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
+import 'package:drawablenotepadflutter/routes/app_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'dart:convert';
+
+import 'package:quiver/strings.dart';
 
 class NoteItem extends StatefulWidget {
-  NoteItem({this.note});
+  NoteItem({Key key, this.note}) : super(key: key);
 
   final Note note;
 
@@ -49,7 +53,7 @@ class NoteItemState extends State<NoteItem> {
         )
       ],
       child: InkWell(
-        onTap: () => print('test'),
+        onTap: () => AppNavigator.navigateToNoteEdit(context, note), //TODO
         child: Padding(
           padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 16.0, right: 16.0),
           child: Column(
@@ -103,12 +107,16 @@ class NoteItemState extends State<NoteItem> {
 
   // Nullable
   String _getSecondLineOfText(String noteText) {
-    if (noteText.contains("\n")) {
-      return _getFirstLineOfText(noteText.substring(
-          noteText.indexOf("\n") + "\n".length, noteText.length - 1));
-    } else {
-      return "No additional text";
+    List<String> lines = new LineSplitter().convert(noteText);
+    if (lines.isNotEmpty) {
+      lines.removeAt(0); // Remove first line since its displayed as title
+      for (var line in lines) {
+        if (isNotBlank(line)) {
+          return line;
+        }
+      }
     }
+    return "No additional text";
   }
 
   String _getDateTimeAsNonNerdText(DateTime dateTime) {

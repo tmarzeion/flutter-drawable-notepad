@@ -1,5 +1,5 @@
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
-import 'package:drawablenotepadflutter/routes/note/note_route.dart';
+import 'package:drawablenotepadflutter/routes/app_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,19 +19,12 @@ class _ListRouteState extends State<ListRoute> {
     // Causes the app to rebuild with the new _selectedChoice.
 
     final database = Provider.of<NotepadDatabase>(context, listen: false);
-
-    database.insertNote(Note(noteText: "SomeTxt ${new DateTime.now().millisecondsSinceEpoch}"));
+    var testDate = new DateTime(2020, 4, 0);
+    database.insertNote(Note(noteText: "SomeTxt ${new DateTime.now().millisecondsSinceEpoch}", noteDate: testDate));
 
     setState(() {
       _selectedChoice = choice;
     });
-  }
-
-  void _navigateToNoteEdit(BuildContext context) {
-    Navigator.of(context)
-        .push(MaterialPageRoute<Null>(builder: (BuildContext context) {
-      return NoteRoute();
-    }));
   }
 
   @override
@@ -58,7 +51,7 @@ class _ListRouteState extends State<ListRoute> {
       body: NotesList(),
       floatingActionButton: FloatingActionButton(
         tooltip: 'Add note',
-        onPressed: () => _navigateToNoteEdit(context),
+        onPressed: () => AppNavigator.navigateToNoteEdit(context, null),
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
