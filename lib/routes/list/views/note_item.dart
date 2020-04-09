@@ -97,29 +97,26 @@ class NoteItemState extends State<NoteItem> {
     // TODO: Implement build
   }
 
-  String _getFirstLineOfText(String noteText) {
-    List<String> lines = new LineSplitter().convert(noteText);
-    if (lines.isNotEmpty) {
-      for (var line in lines) {
-        if (isNotBlank(line)) {
-          return line;
-        }
-      }
+  // Nullable
+  String _getNotBlankLine(String text, int lineIndex) {
+    List<String> lines = new LineSplitter().convert(text);
+    List<String> notBlankLines = lines.where((line) => isNotBlank(line)).toList();
+
+    if (notBlankLines.length - 1 >= lineIndex) {
+      return notBlankLines[lineIndex];
+    } else {
+      return null;
     }
-    return "No title";
+
+  }
+
+  String _getFirstLineOfText(String noteText) {
+    return _getNotBlankLine(noteText, 0) ?? "No title";
   }
 
   // Nullable
   String _getSecondLineOfText(String noteText) {
-    List<String> lines = new LineSplitter().convert(noteText);
-    if (lines.isNotEmpty) {
-      for (var line in lines) {
-        if (isNotBlank(line) && line != _getFirstLineOfText(noteText)) {
-          return line;
-        }
-      }
-    }
-    return "No additional text";
+    return _getNotBlankLine(noteText, 1) ?? "No additional text";
   }
 
   String _getDateTimeAsNonNerdText(DateTime dateTime) {
