@@ -11,14 +11,13 @@ class _FontPickerState extends State<FontPicker> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.blueGrey,
+      color: Color.fromARGB(255, 224, 224, 224),
       child: Center(
-        child: Icon(
-          Icons.format_paint,
-          size: 200,
+        child: Text(
+          "Draw options (in progress)"
         ),
       ),
-      height: 250,
+      height: 50,
     );
   }
 }

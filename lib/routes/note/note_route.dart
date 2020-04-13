@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/zefyr.dart';
 
+import 'views/font_picker_menu_item.dart';
+
 class NoteRoute extends StatefulWidget {
   NoteRoute({Key key, this.note}) : super(key: key);
 
@@ -14,7 +16,7 @@ class NoteRoute extends StatefulWidget {
 
 class _NoteRouteState extends State<NoteRoute> {
   /// Allows to control the editor and the document.
-  ZefyrController _controller; //TODO Edit Zefyr to get draw button state
+  ZefyrController _controller;
 
   /// Zefyr editor like any other input field requires a focus node.
   FocusNode _focusNode;
@@ -33,7 +35,12 @@ class _NoteRouteState extends State<NoteRoute> {
     // Note that the editor requires special `ZefyrScaffold` widget to be
     // one of its parents.
     return Scaffold(
-      appBar: AppBar(title: Text("Editor page")),
+      appBar: AppBar(
+        title: Text("Note"),
+        actions: <Widget>[
+          FontPickerMenuItem(),
+        ],
+      ),
       body: Stack(
         children: [
           ZefyrScaffold(
@@ -43,7 +50,9 @@ class _NoteRouteState extends State<NoteRoute> {
               focusNode: _focusNode,
             ),
           ),
-          FlutterLogo(size: 100, colors: Colors.amber) //TODO Drawer overlay here
+          Container(
+              child: FlutterLogo(
+                  size: 100, colors: Colors.amber))
         ],
       ),
     );
