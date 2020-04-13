@@ -1,5 +1,6 @@
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:flutter/material.dart';
+import 'package:painter/painter.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/zefyr.dart';
 
@@ -16,7 +17,8 @@ class NoteRoute extends StatefulWidget {
 
 class _NoteRouteState extends State<NoteRoute> {
   /// Allows to control the editor and the document.
-  ZefyrController _controller;
+  ZefyrController _zefyrController; //TODO bar visibility listener
+  PainterController _painterController;
 
   /// Zefyr editor like any other input field requires a focus node.
   FocusNode _focusNode;
@@ -26,8 +28,19 @@ class _NoteRouteState extends State<NoteRoute> {
     super.initState();
     // Here we must load the document and pass it to Zefyr controller.
     final document = _loadDocument();
-    _controller = ZefyrController(document);
+    _zefyrController = ZefyrController(document, onToolbarVisibilityChange: (visible) => {
+    print('Toolbar visibility status: $visible')
+    });
+    _painterController= _getPainterController();
     _focusNode = FocusNode();
+  }
+
+  PainterController _getPainterController(){
+    PainterController controller=new PainterController();
+    controller.thickness=5.0;
+    controller.drawColor = Colors.amberAccent;
+    controller.backgroundColor= Colors.transparent;
+    return controller;
   }
 
   @override
@@ -46,13 +59,16 @@ class _NoteRouteState extends State<NoteRoute> {
           ZefyrScaffold(
             child: ZefyrEditor(
               padding: EdgeInsets.all(16),
-              controller: _controller,
+              controller: _zefyrController,
               focusNode: _focusNode,
             ),
           ),
-          Container(
-              child: FlutterLogo(
-                  size: 100, colors: Colors.amber))
+          Padding(
+            padding: const EdgeInsets.only(bottom: ZefyrToolbar.kToolbarHeight), //TODO Dynamic padding reactive for toolbar visibility changes
+            child: Container(
+                child: Painter(_painterController
+                )),
+          )
         ],
       ),
     );
@@ -61,9 +77,10 @@ class _NoteRouteState extends State<NoteRoute> {
   /// Loads the document to be edited in Zefyr.
   NotusDocument _loadDocument() {
     // For simplicity we hardcode a simple document with one line of text
-    // saying "Zefyr Quick Start".
+    // saying ""Notepad test".
     // (Note that delta must always end with newline.)
-    final Delta delta = Delta()..insert("Zefyr Quick Start\n");
+    final Delta delta = Delta()..insert("Notepad test\n");
     return NotusDocument.fromDelta(delta);
   }
+
 }
