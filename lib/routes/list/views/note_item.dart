@@ -31,7 +31,7 @@ class NoteItemState extends State<NoteItem> {
       actionPane: SlidableDrawerActionPane(),
       secondaryActions: <Widget>[
         IconSlideAction(
-          color: Colors.redAccent[100],
+          color: Color.fromARGB(255, 236, 84, 69),
           iconWidget: Container(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -40,12 +40,8 @@ class NoteItemState extends State<NoteItem> {
                 Icon(
                   Icons.delete,
                   color: Colors.white,
-                ),
-                Text(
-                  "Delete",
-                  style: TextStyle(color: Colors.white),
-                )
-              ],
+                  size: 40,
+                )],
             ),
           ),
           //icon: Icons.delete,

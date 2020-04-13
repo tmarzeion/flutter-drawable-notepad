@@ -38,7 +38,6 @@ class _ListRouteState extends State<ListRoute> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Notepad"),
-        backgroundColor: Colors.blueGrey,
         actions: <Widget>[
           IconButton(
             icon: Icon(mainMenuItems[0].icon),

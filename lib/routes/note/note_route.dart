@@ -1,8 +1,7 @@
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import 'views/font_picker_menu_item.dart';
+import 'package:quill_delta/quill_delta.dart';
+import 'package:zefyr/zefyr.dart';
 
 class NoteRoute extends StatefulWidget {
   NoteRoute({Key key, this.note}) : super(key: key);
@@ -14,59 +13,48 @@ class NoteRoute extends StatefulWidget {
 }
 
 class _NoteRouteState extends State<NoteRoute> {
-  final noteTextController = TextEditingController();
+  /// Allows to control the editor and the document.
+  ZefyrController _controller; //TODO Edit Zefyr to get draw button state
 
+  /// Zefyr editor like any other input field requires a focus node.
+  FocusNode _focusNode;
 
   @override
   void initState() {
-    noteTextController.text = widget.note?.noteText ?? "";
     super.initState();
+    // Here we must load the document and pass it to Zefyr controller.
+    final document = _loadDocument();
+    _controller = ZefyrController(document);
+    _focusNode = FocusNode();
   }
 
   @override
   Widget build(BuildContext context) {
-    return new WillPopScope(
-        onWillPop: _onWillPop,
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text("Note"),
-            actions: <Widget>[
-              FontPickerMenuItem(),
-            ],
-          ),
-          body: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    controller: noteTextController,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'Write Your note here…'),
-                  ),
-                ),
-              ],
+    // Note that the editor requires special `ZefyrScaffold` widget to be
+    // one of its parents.
+    return Scaffold(
+      appBar: AppBar(title: Text("Editor page")),
+      body: Stack(
+        children: [
+          ZefyrScaffold(
+            child: ZefyrEditor(
+              padding: EdgeInsets.all(16),
+              controller: _controller,
+              focusNode: _focusNode,
             ),
-          ), // This trailing comma makes auto-formatting nicer for build methods.
-        ));
+          ),
+          FlutterLogo(size: 100, colors: Colors.amber) //TODO Drawer overlay here
+        ],
+      ),
+    );
   }
 
-  Future<bool> _onWillPop() async {
-    final database = Provider.of<NotepadDatabase>(context, listen: false);
-    final noteText = noteTextController.text;
-    if (noteText.isNotEmpty) {
-      if (widget.note != null) {
-        if (widget.note.noteText != noteText) {
-          database.updateNote(widget.note.copyWith(noteText: noteText));
-        }
-      } else {
-        database.insertNote(Note(noteText: noteText, noteDate: new DateTime.now()));
-      }
-    }
-    return true;
+  /// Loads the document to be edited in Zefyr.
+  NotusDocument _loadDocument() {
+    // For simplicity we hardcode a simple document with one line of text
+    // saying "Zefyr Quick Start".
+    // (Note that delta must always end with newline.)
+    final Delta delta = Delta()..insert("Zefyr Quick Start\n");
+    return NotusDocument.fromDelta(delta);
   }
-
 }
