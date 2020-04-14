@@ -1,31 +1,49 @@
 import 'package:flutter/material.dart';
 
-import 'font_picker.dart';
+import '../menu_items_controller.dart';
 
 class FontPickerMenuItem extends StatefulWidget {
+
+  FontPickerMenuItem({Key key, this.onPressed, this.focusNode}) : super(key: key);
+
+  final FocusNode focusNode;
+  final Function onPressed;
+
   @override
-  State createState() => _FontPickerMenuItemState();
+  State createState() => FontPickerMenuItemState();
 }
 
-class _FontPickerMenuItemState extends State<FontPickerMenuItem> {
-  bool fontPickerOpen = false;
+class FontPickerMenuItemState extends State<FontPickerMenuItem> implements Closeable {
+
+  bool isOpen = true; //Visible on start | TODO: :)
   PersistentBottomSheetController bottomSheetController;
 
   @override
   Widget build(BuildContext context) {
+    var color = isOpen ? Colors.white : Colors.black; // TODO better design later
     return IconButton(
-      icon: Icon(Icons.build),
+      icon: Icon(Icons.font_download, color: color),
       onPressed: () {
-        if (fontPickerOpen) {
-          bottomSheetController?.close();
-        } else {
-          bottomSheetController = showBottomSheet(
-              context: context, builder: (context) => FontPicker());
-          bottomSheetController.closed
-              .then((value) => {fontPickerOpen = false});
-          fontPickerOpen = true;
-        }
+        setState(widget.onPressed);
       },
     );
   }
+
+  @override
+  void close() {
+    setState(() {
+      FocusScope.of(context).requestFocus(new FocusNode());
+    });
+  }
+
+  @override
+  bool getState() {
+    return isOpen;
+  }
+
+  @override
+  void open() {
+    setState(widget.focusNode.requestFocus);
+  }
+
 }

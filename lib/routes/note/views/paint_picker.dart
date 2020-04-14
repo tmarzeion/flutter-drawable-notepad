@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class FontPicker extends StatefulWidget {
-  FontPicker({Key key}) : super(key: key);
+class PaintPicker extends StatefulWidget {
+  PaintPicker({Key key}) : super(key: key);
 
   @override
-  _FontPickerState createState() => _FontPickerState();
+  _PaintPickerState createState() => _PaintPickerState();
 }
 
-class _FontPickerState extends State<FontPicker> {
+class _PaintPickerState extends State<PaintPicker> {
   @override
   Widget build(BuildContext context) {
     return Container(

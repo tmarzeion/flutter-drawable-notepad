@@ -1,10 +1,12 @@
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
+import 'package:drawablenotepadflutter/routes/note/views/font_picker_menu_item.dart';
 import 'package:flutter/material.dart';
 import 'package:painter/painter.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/zefyr.dart';
 
-import 'views/font_picker_menu_item.dart';
+import 'menu_items_controller.dart';
+import 'views/paint_picker_menu_item.dart';
 
 class NoteRoute extends StatefulWidget {
   NoteRoute({Key key, this.note}) : super(key: key);
@@ -19,27 +21,34 @@ class _NoteRouteState extends State<NoteRoute> {
   /// Allows to control the editor and the document.
   ZefyrController _zefyrController; //TODO bar visibility listener
   PainterController _painterController;
+  MenuItemsController _menuItemsController;
 
   /// Zefyr editor like any other input field requires a focus node.
   FocusNode _focusNode;
+
+  final _fontPickerKey = GlobalKey<FontPickerMenuItemState>();
+  final _paintPickerkey = GlobalKey<PaintPickerMenuItemState>();
 
   @override
   void initState() {
     super.initState();
     // Here we must load the document and pass it to Zefyr controller.
     final document = _loadDocument();
-    _zefyrController = ZefyrController(document, onToolbarVisibilityChange: (visible) => {
-    print('Toolbar visibility status: $visible')
-    });
-    _painterController= _getPainterController();
+    _zefyrController = ZefyrController(document,
+        onToolbarVisibilityChange: (visible) =>
+            {_menuItemsController.onFontPickerVisibilityChanged(visible)});
+    _painterController = _getPainterController();
+    _menuItemsController = MenuItemsController(
+        fontPickerKey: _fontPickerKey, paintPickerkey: _paintPickerkey);
+
     _focusNode = FocusNode();
   }
 
-  PainterController _getPainterController(){
-    PainterController controller=new PainterController();
-    controller.thickness=5.0;
+  PainterController _getPainterController() {
+    PainterController controller = new PainterController();
+    controller.thickness = 5.0;
     controller.drawColor = Colors.amberAccent;
-    controller.backgroundColor= Colors.transparent;
+    controller.backgroundColor = Colors.transparent;
     return controller;
   }
 
@@ -51,7 +60,14 @@ class _NoteRouteState extends State<NoteRoute> {
       appBar: AppBar(
         title: Text("Note"),
         actions: <Widget>[
-          FontPickerMenuItem(),
+          FontPickerMenuItem(
+            key: _fontPickerKey,
+            onPressed: _menuItemsController.toggleFontPicker,
+            focusNode: _focusNode,
+          ),
+          PaintPickerMenuItem(
+              key: _paintPickerkey,
+              onPressed: _menuItemsController.togglePaintPicker)
         ],
       ),
       body: Stack(
@@ -64,10 +80,10 @@ class _NoteRouteState extends State<NoteRoute> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: ZefyrToolbar.kToolbarHeight), //TODO Dynamic padding reactive for toolbar visibility changes
-            child: Container(
-                child: Painter(_painterController
-                )),
+            padding: const EdgeInsets.only(
+                bottom: ZefyrToolbar
+                    .kToolbarHeight), //TODO Dynamic padding reactive for toolbar visibility changes
+            child: Container(child: Painter(_painterController)),
           )
         ],
       ),
@@ -82,5 +98,4 @@ class _NoteRouteState extends State<NoteRoute> {
     final Delta delta = Delta()..insert("Notepad test\n");
     return NotusDocument.fromDelta(delta);
   }
-
 }
