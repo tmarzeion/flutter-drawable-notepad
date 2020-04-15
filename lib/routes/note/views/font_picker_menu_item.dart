@@ -22,7 +22,7 @@ class FontPickerMenuItemState extends State<FontPickerMenuItem> implements Close
   Widget build(BuildContext context) {
     var color = isOpen ? Colors.white : Colors.black; // TODO better design later
     return IconButton(
-      icon: Icon(Icons.font_download, color: color),
+      icon: Icon(Icons.text_fields, color: color),
       onPressed: () {
         setState(widget.onPressed);
       },

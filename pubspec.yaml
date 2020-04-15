@@ -30,6 +30,7 @@ dependencies:
   flutter_slidable: ^0.5.4
   intl: ^0.16.1
   quiver: ^2.1.3
+  flutter_colorpicker: ^0.3.2
   zefyr:
     git:
       url: git://github.com/tmarzeion/zefyr.git

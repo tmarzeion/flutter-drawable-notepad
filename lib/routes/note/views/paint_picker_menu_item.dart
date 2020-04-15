@@ -1,12 +1,14 @@
 import 'package:drawablenotepadflutter/routes/note/menu_items_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:painter/painter.dart';
 
 import 'paint_picker.dart';
 
 class PaintPickerMenuItem extends StatefulWidget {
-  PaintPickerMenuItem({Key key, this.onPressed}) : super(key: key);
+  PaintPickerMenuItem({Key key, this.onPressed, this.painterController}) : super(key: key);
 
   final Function onPressed;
+  final PainterController painterController;
 
   @override
   State createState() => PaintPickerMenuItemState();
@@ -21,7 +23,7 @@ class PaintPickerMenuItemState extends State<PaintPickerMenuItem>
   Widget build(BuildContext context) {
     var color = bottomSheetOpen ? Colors.white : Colors.black; // TODO better design later
     return IconButton(
-      icon: Icon(Icons.build, color: color),
+      icon: Icon(Icons.brush, color: color),
       onPressed: () {
         setState(widget.onPressed);
       },
@@ -42,7 +44,7 @@ class PaintPickerMenuItemState extends State<PaintPickerMenuItem>
   void open() {
     setState(() {
       bottomSheetController =
-          showBottomSheet(context: context, builder: (context) => PaintPicker());
+          showBottomSheet(context: context, builder: (context) => PaintPicker(widget.painterController));
       bottomSheetController.closed.then((value) => {bottomSheetOpen = false});
       bottomSheetOpen = true;
     });

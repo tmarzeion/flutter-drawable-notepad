@@ -46,10 +46,11 @@ class _NoteRouteState extends State<NoteRoute> {
     _focusNode = FocusNode();
   }
 
+  // TODO: Provide it via DI
   PainterController _getPainterController() {
     PainterController controller = new PainterController();
     controller.thickness = 5.0;
-    controller.drawColor = Colors.amberAccent;
+    controller.drawColor = Colors.red.withAlpha(220); //TODO Use default colors list from paintpicker
     controller.backgroundColor = Colors.transparent;
     return controller;
   }
@@ -72,6 +73,7 @@ class _NoteRouteState extends State<NoteRoute> {
           ),
           PaintPickerMenuItem(
               key: _paintPickerkey,
+              painterController: _painterController,
               onPressed: _drawModeController.togglePaintPicker)
         ],
       ),
