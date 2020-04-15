@@ -31,7 +31,7 @@ class NoteItemState extends State<NoteItem> {
       actionPane: SlidableDrawerActionPane(),
       secondaryActions: <Widget>[
         IconSlideAction(
-          color: Color.fromARGB(255, 236, 84, 69),
+          color: Colors.red.withAlpha(200),
           iconWidget: Container(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
