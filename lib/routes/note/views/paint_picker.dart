@@ -113,3 +113,46 @@ class MenuItem {
   final String title;
   final IconData icon;
 }
+
+
+/* alternate color picker icon
+  Widget _createColorPickerButton() {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      child: Container(
+          child: new PhysicalModel(
+            color: widget.painterController.drawColor,
+            borderRadius: new BorderRadius.circular(25.0),
+            child: Stack(children: <Widget>[
+              new Container(
+                width: 25.0,
+                height: 25.0,
+                decoration: new BoxDecoration(
+                  borderRadius: new BorderRadius.circular(12.5),
+                  border: new Border.all(
+                    width: 3.0,
+                    color: Color.fromARGB(255, 224, 224, 224),
+                  ),
+                ),
+              ),
+              new Container(
+                width: 25.0,
+                height: 25.0,
+                decoration: new BoxDecoration(
+                  borderRadius: new BorderRadius.circular(12.5),
+                  border: new Border.all(
+                    width: 1.5,
+                    color: Colors.black,
+                  ),
+                ),
+              )
+            ]),
+          ),
+          padding: EdgeInsets.all(12.5)),
+      onTap: _showPicker,
+    );
+
+    return IconButton(icon: Icon(Icons.color_lens), onPressed: _showPicker);
+  }
+
+*/

@@ -50,7 +50,7 @@ class _NoteRouteState extends State<NoteRoute> {
   PainterController _getPainterController() {
     PainterController controller = new PainterController();
     controller.thickness = 5.0;
-    controller.drawColor = Colors.red.withAlpha(220); //TODO Use default colors list from paintpicker
+    controller.drawColor = Colors.amber.withAlpha(220); //TODO Use default colors list from paintpicker
     controller.backgroundColor = Colors.transparent;
     return controller;
   }
