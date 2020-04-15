@@ -62,26 +62,48 @@ class _PaintPickerState extends State<PaintPicker> {
   }
 
   Widget _createColorPickerButton() {
-    return IconButton(
-        icon: Icon(Icons.color_lens),
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return Dialog(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                child: SingleChildScrollView(
-                  child: BlockPicker(
-                    pickerColor: widget.painterController.drawColor,
-                    onColorChanged: changeColorAndDismissDialog,
-                    availableColors: _defaultColors,
-                  ),
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      child: Container(
+          child: new PhysicalModel(
+            color: widget.painterController.drawColor,
+            borderRadius: new BorderRadius.circular(25.0),
+            child: new Container(
+              width: 25.0,
+              height: 25.0,
+              decoration: new BoxDecoration(
+                borderRadius: new BorderRadius.circular(12.5),
+                border: new Border.all(
+                  width: 3.0,
+                  color: Colors.black,
                 ),
-              );
-            },
-          );
-        });
+              ),
+            ),
+          ),
+          padding: EdgeInsets.all(12.5)),
+      onTap: _showPicker,
+    );
+
+    return IconButton(icon: Icon(Icons.color_lens), onPressed: _showPicker);
+  }
+
+  void _showPicker() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: SingleChildScrollView(
+            child: BlockPicker(
+              pickerColor: widget.painterController.drawColor,
+              onColorChanged: changeColorAndDismissDialog,
+              availableColors: _defaultColors,
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 
