@@ -39,7 +39,9 @@ class _NoteRouteState extends State<NoteRoute> {
             {_menuItemsController.onFontPickerVisibilityChanged(visible)});
     _painterController = _getPainterController();
     _menuItemsController = MenuItemsController(
-        fontPickerKey: _fontPickerKey, paintPickerkey: _paintPickerkey);
+        fontPickerKey: _fontPickerKey,
+        paintPickerkey: _paintPickerkey,
+        onToolbarStateChanged: () => setState(() => print(''))); //TODO ?
 
     _focusNode = FocusNode();
   }
@@ -56,6 +58,9 @@ class _NoteRouteState extends State<NoteRoute> {
   Widget build(BuildContext context) {
     // Note that the editor requires special `ZefyrScaffold` widget to be
     // one of its parents.
+    final double bottomPainterPadding = _menuItemsController.bottomBarVisible()
+        ? ZefyrToolbar.kToolbarHeight
+        : 0.0;
     return Scaffold(
       appBar: AppBar(
         title: Text("Note"),
@@ -80,9 +85,7 @@ class _NoteRouteState extends State<NoteRoute> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(
-                bottom: ZefyrToolbar
-                    .kToolbarHeight), //TODO Dynamic padding reactive for toolbar visibility changes
+            padding: EdgeInsets.only(bottom: bottomPainterPadding),
             child: Container(child: Painter(_painterController)),
           )
         ],

@@ -4,18 +4,22 @@ import 'package:flutter/widgets.dart';
 
 class MenuItemsController {
 
-  MenuItemsController({this.fontPickerKey, this. paintPickerkey});
+  MenuItemsController({this.fontPickerKey, this.paintPickerkey, this.onToolbarStateChanged});
 
   GlobalKey<FontPickerMenuItemState> fontPickerKey;
   GlobalKey<PaintPickerMenuItemState> paintPickerkey;
+  Function onToolbarStateChanged;
 
-  void hideAll() {
-    fontPickerKey.currentState.close();
-    paintPickerkey.currentState.close();
+  bool bottomBarVisible() {
+    if(fontPickerKey.currentState?.getState() != null && paintPickerkey.currentState?.getState() != null) {
+      return fontPickerKey.currentState.getState() || paintPickerkey.currentState.getState();
+    }
+    return false;
   }
 
   onFontPickerVisibilityChanged(bool visible) {
     fontPickerKey.currentState.isOpen = visible;
+    onToolbarStateChanged?.call();
     if (visible) {
       _hidePaintPicker();
     }
@@ -37,6 +41,7 @@ class MenuItemsController {
   togglePaintPicker() {
     _toggleCloseable(paintPickerkey.currentState);
     _hideFontPicker();
+    onToolbarStateChanged?.call();
   }
 
   // Return new visibility state bool
