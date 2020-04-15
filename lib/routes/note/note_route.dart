@@ -91,7 +91,7 @@ class _NoteRouteState extends State<NoteRoute> {
             ignoring: _drawModeController.isTextMode(),
             child: Padding(
               padding: EdgeInsets.only(bottom: bottomPainterPadding),
-              child: Container(child: Painter(_painterController)),
+              child: Opacity(opacity: 0.6, child: Painter(_painterController)),
             ),
           )
         ],
