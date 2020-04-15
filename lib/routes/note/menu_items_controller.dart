@@ -2,9 +2,9 @@ import 'package:drawablenotepadflutter/routes/note/views/font_picker_menu_item.d
 import 'package:drawablenotepadflutter/routes/note/views/paint_picker_menu_item.dart';
 import 'package:flutter/widgets.dart';
 
-class MenuItemsController {
+class DrawModeController {
 
-  MenuItemsController({this.fontPickerKey, this.paintPickerkey, this.onToolbarStateChanged});
+  DrawModeController({this.fontPickerKey, this.paintPickerkey, this.onToolbarStateChanged});
 
   GlobalKey<FontPickerMenuItemState> fontPickerKey;
   GlobalKey<PaintPickerMenuItemState> paintPickerkey;
@@ -15,6 +15,20 @@ class MenuItemsController {
       return fontPickerKey.currentState.getState() || paintPickerkey.currentState.getState();
     }
     return false;
+  }
+
+  bool isDrawMode() {
+    if (paintPickerkey.currentState?.getState() != null) {
+      return paintPickerkey.currentState.getState();
+    }
+    return false;
+  }
+
+  bool isTextMode() {
+    if (paintPickerkey.currentState?.getState() != null) {
+      return !paintPickerkey.currentState.getState();
+    }
+    return true;
   }
 
   onFontPickerVisibilityChanged(bool visible) {

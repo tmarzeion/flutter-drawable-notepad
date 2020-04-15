@@ -21,7 +21,7 @@ class _NoteRouteState extends State<NoteRoute> {
   /// Allows to control the editor and the document.
   ZefyrController _zefyrController; //TODO bar visibility listener
   PainterController _painterController;
-  MenuItemsController _menuItemsController;
+  DrawModeController _drawModeController;
 
   /// Zefyr editor like any other input field requires a focus node.
   FocusNode _focusNode;
@@ -36,9 +36,9 @@ class _NoteRouteState extends State<NoteRoute> {
     final document = _loadDocument();
     _zefyrController = ZefyrController(document,
         onToolbarVisibilityChange: (visible) =>
-            {_menuItemsController.onFontPickerVisibilityChanged(visible)});
+            {_drawModeController.onFontPickerVisibilityChanged(visible)});
     _painterController = _getPainterController();
-    _menuItemsController = MenuItemsController(
+    _drawModeController = DrawModeController(
         fontPickerKey: _fontPickerKey,
         paintPickerkey: _paintPickerkey,
         onToolbarStateChanged: () => setState(() => print(''))); //TODO ?
@@ -58,7 +58,7 @@ class _NoteRouteState extends State<NoteRoute> {
   Widget build(BuildContext context) {
     // Note that the editor requires special `ZefyrScaffold` widget to be
     // one of its parents.
-    final double bottomPainterPadding = _menuItemsController.bottomBarVisible()
+    final double bottomPainterPadding = _drawModeController.bottomBarVisible()
         ? ZefyrToolbar.kToolbarHeight
         : 0.0;
     return Scaffold(
@@ -67,26 +67,32 @@ class _NoteRouteState extends State<NoteRoute> {
         actions: <Widget>[
           FontPickerMenuItem(
             key: _fontPickerKey,
-            onPressed: _menuItemsController.toggleFontPicker,
+            onPressed: _drawModeController.toggleFontPicker,
             focusNode: _focusNode,
           ),
           PaintPickerMenuItem(
               key: _paintPickerkey,
-              onPressed: _menuItemsController.togglePaintPicker)
+              onPressed: _drawModeController.togglePaintPicker)
         ],
       ),
       body: Stack(
         children: [
-          ZefyrScaffold(
-            child: ZefyrEditor(
-              padding: EdgeInsets.all(16),
-              controller: _zefyrController,
-              focusNode: _focusNode,
+          IgnorePointer(
+            ignoring: _drawModeController.isDrawMode(),
+            child: ZefyrScaffold(
+              child: ZefyrEditor(
+                padding: EdgeInsets.all(16),
+                controller: _zefyrController,
+                focusNode: _focusNode,
+              ),
             ),
           ),
-          Padding(
-            padding: EdgeInsets.only(bottom: bottomPainterPadding),
-            child: Container(child: Painter(_painterController)),
+          IgnorePointer(
+            ignoring: _drawModeController.isTextMode(),
+            child: Padding(
+              padding: EdgeInsets.only(bottom: bottomPainterPadding),
+              child: Container(child: Painter(_painterController)),
+            ),
           )
         ],
       ),
