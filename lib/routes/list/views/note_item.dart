@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'dart:convert';
 
 import 'package:quiver/strings.dart';
+import 'package:zefyr/zefyr.dart';
 
 class NoteItem extends StatefulWidget {
   NoteItem({Key key, this.note}) : super(key: key);
@@ -26,7 +27,12 @@ class NoteItemState extends State<NoteItem> {
   @override
   Widget build(BuildContext context) {
     final database = Provider.of<NotepadDatabase>(context, listen: false);
-
+    var notePlainText =
+        NotusDocument.fromJson(json.decode(note.noteText) as List)
+            .toPlainText();
+    if (notePlainText.startsWith(" ")) {
+      notePlainText = notePlainText.substring(1, notePlainText.length);
+    }
     return Slidable(
       actionPane: SlidableDrawerActionPane(),
       secondaryActions: <Widget>[
@@ -41,7 +47,8 @@ class NoteItemState extends State<NoteItem> {
                   Icons.delete,
                   color: Colors.white,
                   size: 40,
-                )],
+                )
+              ],
             ),
           ),
           //icon: Icons.delete,
@@ -51,17 +58,20 @@ class NoteItemState extends State<NoteItem> {
       child: InkWell(
         onTap: () => AppNavigator.navigateToNoteEdit(context, note), //TODO
         child: Padding(
-          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 16.0, right: 16.0),
+          padding: const EdgeInsets.only(
+              top: 8.0, bottom: 8.0, left: 16.0, right: 16.0),
           child: Column(
             children: [
               Align(
                 alignment: Alignment.topLeft,
                 child: Text(
-                  _getFirstLineOfText(note.noteText),
+                  _getFirstLineOfText(notePlainText),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
                 ),
               ),
               SizedBox(height: 4.0),
@@ -75,7 +85,7 @@ class NoteItemState extends State<NoteItem> {
                   Flexible(
                     child: Container(
                       child: Text(
-                        _getSecondLineOfText(note.noteText),
+                        _getSecondLineOfText(notePlainText),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(color: Colors.grey[500]),
@@ -96,14 +106,14 @@ class NoteItemState extends State<NoteItem> {
   // Nullable
   String _getNotBlankLine(String text, int lineIndex) {
     List<String> lines = new LineSplitter().convert(text);
-    List<String> notBlankLines = lines.where((line) => isNotBlank(line)).toList();
+    List<String> notBlankLines =
+        lines.where((line) => isNotBlank(line)).toList();
 
     if (notBlankLines.length - 1 >= lineIndex) {
       return notBlankLines[lineIndex];
     } else {
       return null;
     }
-
   }
 
   String _getFirstLineOfText(String noteText) {

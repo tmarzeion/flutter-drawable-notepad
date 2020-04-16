@@ -6,7 +6,9 @@ import 'package:drawablenotepadflutter/routes/note/views/font_picker_menu_item.d
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:painter/painter.dart';
+import 'package:provider/provider.dart';
 import 'package:zefyr/zefyr.dart';
+import 'package:quiver/strings.dart';
 
 import 'menu_items_controller.dart';
 import 'views/paint_picker_menu_item.dart';
@@ -65,43 +67,64 @@ class _NoteRouteState extends State<NoteRoute> {
     final double bottomPainterPadding = _drawModeController.bottomBarVisible()
         ? ZefyrToolbar.kToolbarHeight
         : 0.0;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Note"),
-        actions: <Widget>[
-          FontPickerMenuItem(
-            key: _fontPickerKey,
-            onPressed: _drawModeController.toggleFontPicker,
-            focusNode: _focusNode,
-          ),
-          PaintPickerMenuItem(
-              key: _paintPickerkey,
-              painterController: _painterController,
-              onPressed: _drawModeController.togglePaintPicker)
-        ],
-      ),
-      body: Stack(
-        children: [
-          IgnorePointer(
-            ignoring: _drawModeController.isDrawMode(),
-            child: ZefyrScaffold(
-              child: ZefyrEditor(
-                padding: EdgeInsets.all(16),
-                controller: _zefyrController,
-                focusNode: _focusNode,
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Note"),
+          actions: <Widget>[
+            FontPickerMenuItem(
+              key: _fontPickerKey,
+              onPressed: _drawModeController.toggleFontPicker,
+              focusNode: _focusNode,
+            ),
+            PaintPickerMenuItem(
+                key: _paintPickerkey,
+                painterController: _painterController,
+                onPressed: _drawModeController.togglePaintPicker)
+          ],
+        ),
+        body: Stack(
+          children: [
+            IgnorePointer(
+              ignoring: _drawModeController.isDrawMode(),
+              child: ZefyrScaffold(
+                child: ZefyrEditor(
+                  padding: EdgeInsets.all(16),
+                  controller: _zefyrController,
+                  focusNode: _focusNode,
+                ),
               ),
             ),
-          ),
-          IgnorePointer(
-            ignoring: _drawModeController.isTextMode(),
-            child: Padding(
-              padding: EdgeInsets.only(bottom: bottomPainterPadding),
-              child: Opacity(opacity: 0.6, child: Painter(_painterController)),
-            ),
-          )
-        ],
+            IgnorePointer(
+              ignoring: _drawModeController.isTextMode(),
+              child: Padding(
+                padding: EdgeInsets.only(bottom: bottomPainterPadding),
+                child:
+                    Opacity(opacity: 0.6, child: Painter(_painterController)),
+              ),
+            )
+          ],
+        ),
       ),
     );
+  }
+
+  Future<bool> _onWillPop() async {
+    /// Loads the document to be edited in Zefyr.
+    final database = Provider.of<NotepadDatabase>(context, listen: false);
+    if (isNotBlank(_zefyrController.document.toPlainText())) {
+      final noteText = jsonEncode(_zefyrController.document);
+      if (widget.note != null) {
+        if (widget.note.noteText != noteText) {
+          database.updateNote(widget.note.copyWith(noteText: noteText));
+        }
+      } else {
+        database
+            .insertNote(Note(noteText: noteText, noteDate: new DateTime.now()));
+      }
+    }
+    return true;
   }
 
   Future<void> _capturePng() async {
@@ -109,15 +132,12 @@ class _NoteRouteState extends State<NoteRoute> {
     base64Encode(pngBytes); //TODO save as BLOB or Base64 :)
   }
 
-  String _getDocumentAsJson() {
-    return jsonEncode(_zefyrController.document);
-  }
-
   /// Loads the document to be edited in Zefyr.
   NotusDocument _loadDocument() {
-    widget.note.noteText;
-    var jsonStr =
-        "[{\"insert\":\"Hfchjccj\"},{\"insert\":\"\\n\",\"attributes\":{\"heading\":1}},{\"insert\":\"Cjfjmccmcmccmbb\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ul\"}},{\"insert\":\"Lg\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ol\"}},{\"insert\":\"Ccjjf\",\"attributes\":{\"b\":true}},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"code\"}},{\"insert\":\"KgNotepad test\\nFjjffjfj\"},{\"insert\":\"xmmcmcmc\",\"attributes\":{\"b\":true}},{\"insert\":\"\\n\",\"attributes\":{\"heading\":3}}]";
-    return NotusDocument.fromJson(json.decode(jsonStr) as List);
+    if (widget.note != null) {
+      return NotusDocument.fromJson(json.decode(widget.note.noteText) as List);
+    } else {
+      return NotusDocument();
+    }
   }
 }
