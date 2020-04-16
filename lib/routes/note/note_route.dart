@@ -1,8 +1,11 @@
+import 'dart:typed_data';
+import 'dart:convert';
+
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:drawablenotepadflutter/routes/note/views/font_picker_menu_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:painter/painter.dart';
-import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/zefyr.dart';
 
 import 'menu_items_controller.dart';
@@ -42,7 +45,6 @@ class _NoteRouteState extends State<NoteRoute> {
         fontPickerKey: _fontPickerKey,
         paintPickerkey: _paintPickerkey,
         onToolbarStateChanged: () => setState(() => print(''))); //TODO ?
-
     _focusNode = FocusNode();
   }
 
@@ -50,7 +52,8 @@ class _NoteRouteState extends State<NoteRoute> {
   PainterController _getPainterController() {
     PainterController controller = new PainterController();
     controller.thickness = 5.0;
-    controller.drawColor = Colors.amber.withAlpha(220); //TODO Use default colors list from paintpicker
+    controller.drawColor = Colors.amber
+        .withAlpha(220); //TODO Use default colors list from paintpicker
     controller.backgroundColor = Colors.transparent;
     return controller;
   }
@@ -101,12 +104,20 @@ class _NoteRouteState extends State<NoteRoute> {
     );
   }
 
+  Future<void> _capturePng() async {
+    Uint8List pngBytes = await _painterController.finish().toPNG();
+    base64Encode(pngBytes); //TODO save as BLOB or Base64 :)
+  }
+
+  String _getDocumentAsJson() {
+    return jsonEncode(_zefyrController.document);
+  }
+
   /// Loads the document to be edited in Zefyr.
   NotusDocument _loadDocument() {
-    // For simplicity we hardcode a simple document with one line of text
-    // saying ""Notepad test".
-    // (Note that delta must always end with newline.)
-    final Delta delta = Delta()..insert("Notepad test\n");
-    return NotusDocument.fromDelta(delta);
+    widget.note.noteText;
+    var jsonStr =
+        "[{\"insert\":\"Hfchjccj\"},{\"insert\":\"\\n\",\"attributes\":{\"heading\":1}},{\"insert\":\"Cjfjmccmcmccmbb\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ul\"}},{\"insert\":\"Lg\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ol\"}},{\"insert\":\"Ccjjf\",\"attributes\":{\"b\":true}},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"code\"}},{\"insert\":\"KgNotepad test\\nFjjffjfj\"},{\"insert\":\"xmmcmcmc\",\"attributes\":{\"b\":true}},{\"insert\":\"\\n\",\"attributes\":{\"heading\":3}}]";
+    return NotusDocument.fromJson(json.decode(jsonStr) as List);
   }
 }
