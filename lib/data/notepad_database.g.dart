@@ -165,7 +165,7 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
   GeneratedTextColumn get noteText => _noteText ??= _constructNoteText();
   GeneratedTextColumn _constructNoteText() {
     return GeneratedTextColumn('note_text', $tableName, false,
-        minTextLength: 1, maxTextLength: 2048);
+        minTextLength: 1, maxTextLength: 16384);
   }
 
   final VerificationMeta _noteDateMeta = const VerificationMeta('noteDate');
