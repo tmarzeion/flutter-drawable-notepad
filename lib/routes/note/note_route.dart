@@ -120,16 +120,13 @@ class _NoteRouteState extends State<NoteRoute> {
           database.updateNote(widget.note.copyWith(noteText: noteText));
         }
       } else {
-        database
-            .insertNote(Note(noteText: noteText, noteDate: new DateTime.now()));
+        database.insertNote(Note(
+            noteText: noteText,
+            noteDate: new DateTime.now(),
+            bitmap: await _painterController.finish().toPNG()));
       }
     }
     return true;
-  }
-
-  Future<void> _capturePng() async {
-    Uint8List pngBytes = await _painterController.finish().toPNG();
-    base64Encode(pngBytes); //TODO save as BLOB or Base64 :)
   }
 
   /// Loads the document to be edited in Zefyr.
