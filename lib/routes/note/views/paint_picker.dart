@@ -1,11 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:painter/painter.dart';
 
 const alpha = 220;
 const bottomBarHeight = 50.0;
 const undoDisabledColor = Colors.black26;
+
+class DrawThicknessMode {
+  DrawThicknessMode(this.thickness, this.icon);
+
+  double thickness;
+  IconData icon;
+
+}
+
+const defaultThicknessMode = 1;
+List<DrawThicknessMode> _drawThicknessModes = [ //TODO Placeholder icons
+  DrawThicknessMode(2.0, Icons.arrow_right),
+  DrawThicknessMode(5.0, Icons.chevron_right),
+  DrawThicknessMode(10.0, Icons.arrow_forward_ios)
+];
 
 List<Color> _defaultColors = [
   Colors.red.withAlpha(alpha),
@@ -41,6 +55,7 @@ class PaintPicker extends StatefulWidget {
 
 class _PaintPickerState extends State<PaintPicker> {
   bool hasHistory = false;
+  int currentThicknessMode = defaultThicknessMode;
 
   void changeColorAndDismissDialog(Color color) {
     setState(() {
@@ -57,7 +72,7 @@ class _PaintPickerState extends State<PaintPicker> {
 
   @override
   Widget build(BuildContext context) {
-    print('$hasHistory');
+    widget.painterController.thickness = _drawThicknessModes[currentThicknessMode].thickness;
     return Container(
       color: Color.fromARGB(255, 224, 224, 224),
       child: Center(
@@ -122,7 +137,7 @@ class _PaintPickerState extends State<PaintPicker> {
   _createThicknessPickerButton() {
     return FlatButton(
       child: Container(
-          child: Icon(Icons.format_paint), padding: EdgeInsets.all(12.5)),
+          child: Icon(_drawThicknessModes[currentThicknessMode].icon), padding: EdgeInsets.all(12.5)),
       onPressed: _changeThickness,
     );
   }
@@ -156,7 +171,11 @@ class _PaintPickerState extends State<PaintPicker> {
   }
 
   void _changeThickness() {
-    print('THICKNESS PRESSED');
+    currentThicknessMode++;
+    setState(() {
+      currentThicknessMode = currentThicknessMode%_drawThicknessModes.length;
+      print('MODE $currentThicknessMode');
+    });
   }
 
   void _refreshHistoryState() {
