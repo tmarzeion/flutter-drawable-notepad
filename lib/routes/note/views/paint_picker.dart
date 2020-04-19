@@ -55,6 +55,7 @@ class PaintPicker extends StatefulWidget {
 
 class _PaintPickerState extends State<PaintPicker> {
   bool hasHistory = false;
+  bool eraseMode = false;
   int currentThicknessMode = defaultThicknessMode;
 
   void changeColorAndDismissDialog(Color color) {
@@ -112,8 +113,6 @@ class _PaintPickerState extends State<PaintPicker> {
           padding: EdgeInsets.all(12.5)),
       onPressed: _showPicker,
     );
-
-    return IconButton(icon: Icon(Icons.color_lens), onPressed: _showPicker);
   }
 
   _createUndoButton() {
@@ -129,8 +128,9 @@ class _PaintPickerState extends State<PaintPicker> {
   _createEraserButton() {
     return FlatButton(
       //behavior: HitTestBehavior.translucent,
-      child: Container(child: Icon(Icons.close), padding: EdgeInsets.all(12.5)),
-      onPressed: _eraseMode,
+      child: Container(child: Icon(Icons.close,
+      color: eraseMode ? Colors.black : undoDisabledColor,), padding: EdgeInsets.all(12.5)),
+      onPressed: _toggleEraseMode,
     );
   }
 
@@ -166,8 +166,11 @@ class _PaintPickerState extends State<PaintPicker> {
     _refreshHistoryState();
   }
 
-  void _eraseMode() {
-    print('ERASE PRESSED');
+  void _toggleEraseMode() {
+    widget.painterController.eraseMode = !widget.painterController.eraseMode;
+    setState(() {
+      eraseMode = widget.painterController.eraseMode;
+    });
   }
 
   void _changeThickness() {
