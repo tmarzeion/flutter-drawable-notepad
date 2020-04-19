@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'dart:convert';
 
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
