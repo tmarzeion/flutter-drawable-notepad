@@ -68,6 +68,7 @@ class _PaintPickerState extends State<PaintPicker> {
   @override
   void initState() {
     super.initState();
+    hasHistory = widget.painterController.hasHistory();
     widget.painterController.setOnDrawStepListener(_refreshHistoryState);
   }
 

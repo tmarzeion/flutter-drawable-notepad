@@ -51,7 +51,8 @@ class _NoteRouteState extends State<NoteRoute> {
 
   // TODO: Provide it via DI
   PainterController _getPainterController() {
-    PainterController controller = new PainterController();
+    PainterController controller =
+        new PainterController(widget.note != null ? widget.note.paths : null);
     controller.thickness = 5.0;
     controller.drawColor = Colors.amber
         .withAlpha(220); //TODO Use default colors list from paintpicker
@@ -110,19 +111,30 @@ class _NoteRouteState extends State<NoteRoute> {
   }
 
   Future<bool> _onWillPop() async {
+
+    if (_drawModeController.isDrawMode()) return true;
+
     /// Loads the document to be edited in Zefyr.
     final database = Provider.of<NotepadDatabase>(context, listen: false);
-    if (isNotBlank(_zefyrController.document.toPlainText())) {
+
+    String paintHistory = _painterController.history;
+
+    if (isNotBlank(_zefyrController.document.toPlainText()) || paintHistory.length >= 3) {
       final noteText = jsonEncode(_zefyrController.document);
       if (widget.note != null) {
-        if (widget.note.noteText != noteText) {
-          database.updateNote(widget.note.copyWith(noteText: noteText));
+        if (widget.note.noteText != noteText || widget.note.paths != paintHistory) {
+          database.updateNote(widget.note
+              .copyWith(noteText: noteText, paths: paintHistory == null ? "[]" : paintHistory));
         }
       } else {
         database.insertNote(Note(
             noteText: noteText,
             noteDate: new DateTime.now(),
-            bitmap: await _painterController.finish().toPNG()));
+            paths: paintHistory));
+      }
+    } else {
+      if (widget.note != null) {
+        database.deleteNote(widget.note);
       }
     }
     return true;
