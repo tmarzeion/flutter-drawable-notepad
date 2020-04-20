@@ -9,25 +9,24 @@ part of 'notepad_database.dart';
 // ignore_for_file: unnecessary_brace_in_string_interps, unnecessary_this
 class Note extends DataClass implements Insertable<Note> {
   final int id;
-  final Uint8List bitmap;
+  final String paths;
   final String noteText;
   final DateTime noteDate;
   Note(
       {@required this.id,
-      this.bitmap,
+      this.paths,
       @required this.noteText,
       @required this.noteDate});
   factory Note.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
     final intType = db.typeSystem.forDartType<int>();
-    final uint8ListType = db.typeSystem.forDartType<Uint8List>();
     final stringType = db.typeSystem.forDartType<String>();
     final dateTimeType = db.typeSystem.forDartType<DateTime>();
     return Note(
       id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
-      bitmap: uint8ListType
-          .mapFromDatabaseResponse(data['${effectivePrefix}bitmap']),
+      paths:
+          stringType.mapFromDatabaseResponse(data['${effectivePrefix}paths']),
       noteText: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}note_text']),
       noteDate: dateTimeType
@@ -39,7 +38,7 @@ class Note extends DataClass implements Insertable<Note> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return Note(
       id: serializer.fromJson<int>(json['id']),
-      bitmap: serializer.fromJson<Uint8List>(json['bitmap']),
+      paths: serializer.fromJson<String>(json['paths']),
       noteText: serializer.fromJson<String>(json['noteText']),
       noteDate: serializer.fromJson<DateTime>(json['noteDate']),
     );
@@ -49,7 +48,7 @@ class Note extends DataClass implements Insertable<Note> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'bitmap': serializer.toJson<Uint8List>(bitmap),
+      'paths': serializer.toJson<String>(paths),
       'noteText': serializer.toJson<String>(noteText),
       'noteDate': serializer.toJson<DateTime>(noteDate),
     };
@@ -59,8 +58,8 @@ class Note extends DataClass implements Insertable<Note> {
   NotesCompanion createCompanion(bool nullToAbsent) {
     return NotesCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
-      bitmap:
-          bitmap == null && nullToAbsent ? const Value.absent() : Value(bitmap),
+      paths:
+          paths == null && nullToAbsent ? const Value.absent() : Value(paths),
       noteText: noteText == null && nullToAbsent
           ? const Value.absent()
           : Value(noteText),
@@ -70,11 +69,10 @@ class Note extends DataClass implements Insertable<Note> {
     );
   }
 
-  Note copyWith(
-          {int id, Uint8List bitmap, String noteText, DateTime noteDate}) =>
+  Note copyWith({int id, String paths, String noteText, DateTime noteDate}) =>
       Note(
         id: id ?? this.id,
-        bitmap: bitmap ?? this.bitmap,
+        paths: paths ?? this.paths,
         noteText: noteText ?? this.noteText,
         noteDate: noteDate ?? this.noteDate,
       );
@@ -82,7 +80,7 @@ class Note extends DataClass implements Insertable<Note> {
   String toString() {
     return (StringBuffer('Note(')
           ..write('id: $id, ')
-          ..write('bitmap: $bitmap, ')
+          ..write('paths: $paths, ')
           ..write('noteText: $noteText, ')
           ..write('noteDate: $noteDate')
           ..write(')'))
@@ -91,43 +89,43 @@ class Note extends DataClass implements Insertable<Note> {
 
   @override
   int get hashCode => $mrjf($mrjc(id.hashCode,
-      $mrjc(bitmap.hashCode, $mrjc(noteText.hashCode, noteDate.hashCode))));
+      $mrjc(paths.hashCode, $mrjc(noteText.hashCode, noteDate.hashCode))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
       (other is Note &&
           other.id == this.id &&
-          other.bitmap == this.bitmap &&
+          other.paths == this.paths &&
           other.noteText == this.noteText &&
           other.noteDate == this.noteDate);
 }
 
 class NotesCompanion extends UpdateCompanion<Note> {
   final Value<int> id;
-  final Value<Uint8List> bitmap;
+  final Value<String> paths;
   final Value<String> noteText;
   final Value<DateTime> noteDate;
   const NotesCompanion({
     this.id = const Value.absent(),
-    this.bitmap = const Value.absent(),
+    this.paths = const Value.absent(),
     this.noteText = const Value.absent(),
     this.noteDate = const Value.absent(),
   });
   NotesCompanion.insert({
     this.id = const Value.absent(),
-    this.bitmap = const Value.absent(),
+    this.paths = const Value.absent(),
     @required String noteText,
     @required DateTime noteDate,
   })  : noteText = Value(noteText),
         noteDate = Value(noteDate);
   NotesCompanion copyWith(
       {Value<int> id,
-      Value<Uint8List> bitmap,
+      Value<String> paths,
       Value<String> noteText,
       Value<DateTime> noteDate}) {
     return NotesCompanion(
       id: id ?? this.id,
-      bitmap: bitmap ?? this.bitmap,
+      paths: paths ?? this.paths,
       noteText: noteText ?? this.noteText,
       noteDate: noteDate ?? this.noteDate,
     );
@@ -147,13 +145,13 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
         hasAutoIncrement: true, declaredAsPrimaryKey: true);
   }
 
-  final VerificationMeta _bitmapMeta = const VerificationMeta('bitmap');
-  GeneratedBlobColumn _bitmap;
+  final VerificationMeta _pathsMeta = const VerificationMeta('paths');
+  GeneratedTextColumn _paths;
   @override
-  GeneratedBlobColumn get bitmap => _bitmap ??= _constructBitmap();
-  GeneratedBlobColumn _constructBitmap() {
-    return GeneratedBlobColumn(
-      'bitmap',
+  GeneratedTextColumn get paths => _paths ??= _constructPaths();
+  GeneratedTextColumn _constructPaths() {
+    return GeneratedTextColumn(
+      'paths',
       $tableName,
       true,
     );
@@ -181,7 +179,7 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
   }
 
   @override
-  List<GeneratedColumn> get $columns => [id, bitmap, noteText, noteDate];
+  List<GeneratedColumn> get $columns => [id, paths, noteText, noteDate];
   @override
   $NotesTable get asDslTable => this;
   @override
@@ -195,9 +193,9 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
     if (d.id.present) {
       context.handle(_idMeta, id.isAcceptableValue(d.id.value, _idMeta));
     }
-    if (d.bitmap.present) {
+    if (d.paths.present) {
       context.handle(
-          _bitmapMeta, bitmap.isAcceptableValue(d.bitmap.value, _bitmapMeta));
+          _pathsMeta, paths.isAcceptableValue(d.paths.value, _pathsMeta));
     }
     if (d.noteText.present) {
       context.handle(_noteTextMeta,
@@ -228,8 +226,8 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
     if (d.id.present) {
       map['id'] = Variable<int, IntType>(d.id.value);
     }
-    if (d.bitmap.present) {
-      map['bitmap'] = Variable<Uint8List, BlobType>(d.bitmap.value);
+    if (d.paths.present) {
+      map['paths'] = Variable<String, StringType>(d.paths.value);
     }
     if (d.noteText.present) {
       map['note_text'] = Variable<String, StringType>(d.noteText.value);

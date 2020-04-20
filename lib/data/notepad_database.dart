@@ -4,7 +4,7 @@ part 'notepad_database.g.dart';
 
 class Notes extends Table {
   IntColumn get id => integer().autoIncrement()();
-  BlobColumn get bitmap => blob().nullable()();
+  TextColumn get paths => text().nullable()();
   TextColumn get noteText => text().withLength(min: 1, max: 16384)();
   DateTimeColumn get noteDate => dateTime()();
 }
