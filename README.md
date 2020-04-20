@@ -1,6 +1,9 @@
 # Drawable Notepad
 
+
 Flutter reimplementation of existing [Drawable Notepad App](https://github.com/tmarzeion/drawable-notepad)
+
+[Sample movie](https://youtu.be/lIvEx7EyFF4)
 
 TODO:
 - Drawing history optimization (don't redraw whole history with every ui update)
