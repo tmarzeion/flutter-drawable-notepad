@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:painter/painter.dart';
 
 const alpha = 220;
@@ -7,18 +8,20 @@ const bottomBarHeight = 50.0;
 const undoDisabledColor = Colors.black26;
 
 class DrawThicknessMode {
-  DrawThicknessMode(this.thickness, this.icon);
+  DrawThicknessMode(this.thickness, this.vectorAssetPath);
 
   double thickness;
-  IconData icon;
-
+  double vectorPadding;
+  String vectorAssetPath;
 }
 
-const defaultThicknessMode = 1;
-List<DrawThicknessMode> _drawThicknessModes = [ //TODO Placeholder icons
-  DrawThicknessMode(2.0, Icons.arrow_right),
-  DrawThicknessMode(5.0, Icons.chevron_right),
-  DrawThicknessMode(10.0, Icons.arrow_forward_ios)
+const defaultThicknessMode = 2;
+List<DrawThicknessMode> _drawThicknessModes = [
+  DrawThicknessMode(2.0, "assets/1.svg"),
+  DrawThicknessMode(5.0, "assets/2.svg"),
+  DrawThicknessMode(10.0, "assets/3.svg"),
+  DrawThicknessMode(20.0, "assets/4.svg"),
+  DrawThicknessMode(40.0, "assets/5.svg"),
 ];
 
 List<Color> _defaultColors = [
@@ -74,7 +77,8 @@ class _PaintPickerState extends State<PaintPicker> {
 
   @override
   Widget build(BuildContext context) {
-    widget.painterController.thickness = _drawThicknessModes[currentThicknessMode].thickness;
+    widget.painterController.thickness =
+        _drawThicknessModes[currentThicknessMode].thickness;
     return Container(
       color: Color.fromARGB(255, 224, 224, 224),
       child: Center(
@@ -119,27 +123,38 @@ class _PaintPickerState extends State<PaintPicker> {
   _createUndoButton() {
     return FlatButton(
       child: Container(
-          child: Icon(Icons.undo,
-              color: hasHistory ? Colors.black : undoDisabledColor),
-          padding: EdgeInsets.all(12.5)),
+          width: 50,
+          height: 50,
+          padding: EdgeInsets.all(12.5),
+          child: SvgPicture.asset(
+            "assets/undo-alt.svg",
+            color: hasHistory ? Colors.black : undoDisabledColor,
+          )),
       onPressed: hasHistory ? _undoPaintStep : null,
     );
   }
 
   _createEraserButton() {
     return FlatButton(
-      //behavior: HitTestBehavior.translucent,
-      child: Container(child: Icon(Icons.close,
-      color: eraseMode ? Colors.black : undoDisabledColor,), padding: EdgeInsets.all(12.5)),
+      color: eraseMode ? Colors.amber.withAlpha(150) : null,
+      child: Container(
+          width: 50,
+          height: 50,
+          padding: EdgeInsets.all(12.5),
+          child: SvgPicture.asset("assets/eraser.svg")),
       onPressed: _toggleEraseMode,
     );
   }
 
   _createThicknessPickerButton() {
     return FlatButton(
-      child: Container(
-          child: Icon(_drawThicknessModes[currentThicknessMode].icon), padding: EdgeInsets.all(12.5)),
       onPressed: _changeThickness,
+      child: Container(
+          width: 50,
+          height: 50,
+          padding: EdgeInsets.all(8),
+          child: SvgPicture.asset(
+              _drawThicknessModes[currentThicknessMode].vectorAssetPath)),
     );
   }
 
@@ -177,7 +192,7 @@ class _PaintPickerState extends State<PaintPicker> {
   void _changeThickness() {
     currentThicknessMode++;
     setState(() {
-      currentThicknessMode = currentThicknessMode%_drawThicknessModes.length;
+      currentThicknessMode = currentThicknessMode % _drawThicknessModes.length;
       print('MODE $currentThicknessMode');
     });
   }
