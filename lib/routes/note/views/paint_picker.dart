@@ -57,13 +57,12 @@ class PaintPicker extends StatefulWidget {
 }
 
 class _PaintPickerState extends State<PaintPicker> {
-  bool hasHistory = false;
-  bool eraseMode = false;
   int currentThicknessMode = defaultThicknessMode;
 
   void changeColorAndDismissDialog(Color color) {
     setState(() {
       widget.painterController.drawColor = color;
+      widget.painterController.eraseMode = false;
       Navigator.pop(context);
     });
   }
@@ -71,7 +70,6 @@ class _PaintPickerState extends State<PaintPicker> {
   @override
   void initState() {
     super.initState();
-    hasHistory = widget.painterController.hasHistory();
     widget.painterController.setOnDrawStepListener(_refreshHistoryState);
   }
 
@@ -101,7 +99,7 @@ class _PaintPickerState extends State<PaintPicker> {
     return FlatButton(
       child: Container(
           child: new PhysicalModel(
-            color: widget.painterController.drawColor,
+            color: widget.painterController.eraseMode ? Colors.white : widget.painterController.drawColor,
             borderRadius: new BorderRadius.circular(25.0),
             child: new Container(
               width: 25.0,
@@ -121,6 +119,7 @@ class _PaintPickerState extends State<PaintPicker> {
   }
 
   _createUndoButton() {
+    bool hasHistory = widget.painterController.hasHistory();
     return FlatButton(
       child: Container(
           width: 50,
@@ -136,7 +135,7 @@ class _PaintPickerState extends State<PaintPicker> {
 
   _createEraserButton() {
     return FlatButton(
-      color: eraseMode ? Colors.amber.withAlpha(150) : null,
+      color: widget.painterController.eraseMode ? Colors.amber.withAlpha(150) : null,
       child: Container(
           width: 50,
           height: 50,
@@ -159,6 +158,9 @@ class _PaintPickerState extends State<PaintPicker> {
   }
 
   void _showPicker() {
+    setState(() {
+      widget.painterController.eraseMode = false;
+    });
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -185,7 +187,7 @@ class _PaintPickerState extends State<PaintPicker> {
   void _toggleEraseMode() {
     widget.painterController.eraseMode = !widget.painterController.eraseMode;
     setState(() {
-      eraseMode = widget.painterController.eraseMode;
+      widget.painterController.eraseMode = widget.painterController.eraseMode;
     });
   }
 
@@ -199,7 +201,6 @@ class _PaintPickerState extends State<PaintPicker> {
 
   void _refreshHistoryState() {
     setState(() {
-      hasHistory = widget.painterController.hasHistory();
     });
   }
 }
