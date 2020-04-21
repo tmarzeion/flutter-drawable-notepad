@@ -30,11 +30,13 @@ dependencies:
   flutter_slidable: ^0.5.4
   intl: ^0.16.1
   quiver: ^2.1.3
+  flutter_svg: ^0.17.4
   flutter_colorpicker: ^0.3.2
   zefyr:
     git:
       url: git://github.com/tmarzeion/zefyr.git
       path: packages/zefyr/
+      ref: 3cf3fa7d1d1b9438dc57635e2a6f1ef7291aeae3
   painter:
     git:
       url: git://github.com/tmarzeion/painter.git
@@ -56,6 +58,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
+  assets:
+    - assets/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
