@@ -13,6 +13,7 @@ TODO:
 - Tests + CI
 - Architecture refactor (DI, State management, clean arch)
 - Share feature
+- Note updating on fly
 
 Bugs:
 - Tapping without drag in draw mode should draw dots. currently it draws nothing, but still triggering undo button.
