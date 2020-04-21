@@ -117,12 +117,16 @@ class NoteItemState extends State<NoteItem> {
   }
 
   String _getFirstLineOfText(String noteText) {
-    return _getNotBlankLine(noteText, 0) ?? "No title";
+    return _getNotBlankLine(noteText, 0) ?? "New note";
   }
 
   // Nullable
   String _getSecondLineOfText(String noteText) {
-    return _getNotBlankLine(noteText, 1) ?? "No additional text";
+    if (_getNotBlankLine(noteText, 0) == null) {
+      return "Handwritten Note";
+    } else {
+      return _getNotBlankLine(noteText, 1) ?? "No additional text";
+    }
   }
 
   String _getDateTimeAsNonNerdText(DateTime dateTime) {
