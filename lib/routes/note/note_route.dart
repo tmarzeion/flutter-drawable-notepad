@@ -52,7 +52,7 @@ class _NoteRouteState extends State<NoteRoute> {
   // TODO: Provide it via DI
   PainterController _getPainterController() {
     PainterController controller =
-        new PainterController(widget.note != null ? widget.note.paths : null);
+        new PainterController(widget.note != null ? widget.note.paths : null, compressionLevel: 8);
     controller.thickness = 5.0;
     controller.drawColor = Colors.amber
         .withAlpha(220); //TODO Use default colors list from paintpicker

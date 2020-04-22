@@ -20,8 +20,8 @@ List<DrawThicknessMode> _drawThicknessModes = [
   DrawThicknessMode(2.0, "assets/1.svg"),
   DrawThicknessMode(5.0, "assets/2.svg"),
   DrawThicknessMode(10.0, "assets/3.svg"),
-  DrawThicknessMode(20.0, "assets/4.svg"),
-  DrawThicknessMode(40.0, "assets/5.svg"),
+  DrawThicknessMode(14.0, "assets/4.svg"),
+  DrawThicknessMode(18.0, "assets/5.svg"),
 ];
 
 List<Color> _defaultColors = [
