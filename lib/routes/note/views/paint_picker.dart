@@ -1,7 +1,12 @@
+import 'dart:io';
+
+import 'package:drawablenotepadflutter/const.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:painter/painter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const alpha = 220;
 const bottomBarHeight = 50.0;
@@ -146,6 +151,7 @@ class _PaintPickerState extends State<PaintPicker> {
           padding: EdgeInsets.all(12.5),
           child: SvgPicture.asset("assets/eraser.svg")),
       onPressed: _toggleEraseMode,
+      onLongPress: _clearWithAlert,
     );
   }
 
@@ -190,9 +196,79 @@ class _PaintPickerState extends State<PaintPicker> {
 
   void _toggleEraseMode() {
     widget.painterController.eraseMode = !widget.painterController.eraseMode;
-    setState(() {
-      widget.painterController.eraseMode = widget.painterController.eraseMode;
-    });
+    setState(() {});
+  }
+
+  void _clearWithAlert() async {
+    if (Platform.isAndroid) {
+      showMaterialEraseAlertDialog();
+    } else if (Platform.isIOS) {
+      showCupertinoEraseAlertDialog();
+    }
+  }
+
+  void showCupertinoEraseAlertDialog() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text("Are you sure?"),
+          content:
+          Text("Long pressing erase button will clear the whole drawing"),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text('Erase', style: TextStyle(
+                color: Color.fromARGB(255, 255, 59, 48)
+              ),),
+              onPressed: () async {
+                _clear();
+                Navigator.of(context).pop();
+              },
+            ),
+            CupertinoDialogAction(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showMaterialEraseAlertDialog() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Are you sure?"),
+          content:
+          Text("Long pressing erase button will clear the whole drawing"),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Erase'.toUpperCase()),
+              onPressed: () async {
+                _clear();
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('Cancel'.toUpperCase()),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _clear() {
+    widget.painterController.clear();
+    widget.painterController.eraseMode = false;
+    setState(() {});
   }
 
   void _changeThickness() {
