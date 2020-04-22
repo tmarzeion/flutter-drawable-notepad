@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:zefyr/zefyr.dart';
 import 'package:quiver/strings.dart';
 
+import '../../const.dart';
 import 'menu_items_controller.dart';
 import 'views/paint_picker_menu_item.dart';
 
@@ -22,37 +23,44 @@ class NoteRoute extends StatefulWidget {
 }
 
 class _NoteRouteState extends State<NoteRoute> {
-  /// Allows to control the editor and the document.
-  ZefyrController _zefyrController; //TODO bar visibility listener
+
+  // Controllers
+  ZefyrController _zefyrController;
   PainterController _painterController;
   DrawModeController _drawModeController;
 
-  /// Zefyr editor like any other input field requires a focus node.
+  /// For zefyr
   FocusNode _focusNode;
 
+  // Keys
   final _fontPickerKey = GlobalKey<FontPickerMenuItemState>();
   final _paintPickerkey = GlobalKey<PaintPickerMenuItemState>();
 
   @override
   void initState() {
     super.initState();
-    // Here we must load the document and pass it to Zefyr controller.
+
+    // Init zefyr
     final document = _loadDocument();
     _zefyrController = ZefyrController(document,
         onToolbarVisibilityChange: (visible) =>
             {_drawModeController.onFontPickerVisibilityChanged(visible)});
+    _focusNode = FocusNode();
+
+    // Init painter
     _painterController = _getPainterController();
+
+    // Init mode controller
     _drawModeController = DrawModeController(
         fontPickerKey: _fontPickerKey,
         paintPickerkey: _paintPickerkey,
-        onToolbarStateChanged: () => setState(() => print(''))); //TODO ?
-    _focusNode = FocusNode();
+        onToolbarStateChanged: () => setState(() {}));
   }
 
   // TODO: Provide it via DI
   PainterController _getPainterController() {
     PainterController controller =
-        new PainterController(widget.note != null ? widget.note.paths : null, compressionLevel: 8);
+        new PainterController(widget.note != null ? widget.note.paths : null, compressionLevel: Settings.painterPathCompressionLevel);
     controller.thickness = 5.0;
     controller.drawColor = Colors.amber
         .withAlpha(220); //TODO Use default colors list from paintpicker

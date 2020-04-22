@@ -3,6 +3,8 @@ import 'package:drawablenotepadflutter/routes/list/views/note_item.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../const.dart';
+
 class NotesList extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -30,7 +32,7 @@ class NotesListState extends State<NotesList> {
                   note: itemNote);
             },
             separatorBuilder: (context, index) => Divider(
-              color: Colors.grey[600],
+              color: Settings.noteItemSeparatorColor,
               height: 0.0,
             ),
             itemCount: notes.length);

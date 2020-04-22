@@ -2,6 +2,7 @@ import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'const.dart';
 import 'routes/list/list_route.dart';
 
 void main() {
@@ -16,9 +17,9 @@ class MyApp extends StatelessWidget {
       // The single instance of NotepadDatabase
       create: (_) => NotepadDatabase(),
       child: MaterialApp(
-        title: 'Drawable Notepad',
+        title: StringResources.appTitle,
         theme: ThemeData(
-          primarySwatch: Colors.amber,
+          primarySwatch: Settings.defaultColor.withAlpha(255), //Default color here
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         home: ListRoute(),

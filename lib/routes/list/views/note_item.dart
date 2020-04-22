@@ -1,3 +1,4 @@
+import 'package:drawablenotepadflutter/const.dart';
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:drawablenotepadflutter/routes/app_navigator.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +38,7 @@ class NoteItemState extends State<NoteItem> {
       actionPane: SlidableDrawerActionPane(),
       secondaryActions: <Widget>[
         IconSlideAction(
-          color: Colors.red.withAlpha(200),
+          color: Settings.swipeDeleteBackgroundColor,
           iconWidget: Container(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -45,8 +46,8 @@ class NoteItemState extends State<NoteItem> {
               children: [
                 Icon(
                   Icons.delete,
-                  color: Colors.white,
-                  size: 40,
+                  color: Settings.swipeDeleteIconColor,
+                  size: Settings.swipeDeleteIconSize,
                 )
               ],
             ),
@@ -56,7 +57,7 @@ class NoteItemState extends State<NoteItem> {
         )
       ],
       child: InkWell(
-        onTap: () => AppNavigator.navigateToNoteEdit(context, note), //TODO
+        onTap: () => AppNavigator.navigateToNoteEdit(context, note),
         child: Padding(
           padding: const EdgeInsets.only(
               top: 8.0, bottom: 8.0, left: 16.0, right: 16.0),
@@ -69,7 +70,7 @@ class NoteItemState extends State<NoteItem> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                      color: Colors.black,
+                      color: Settings.noteItemTitleColor,
                       fontWeight: FontWeight.bold,
                       fontSize: 16),
                 ),
@@ -80,7 +81,7 @@ class NoteItemState extends State<NoteItem> {
                   Text(_getDateTimeAsNonNerdText(note.noteDate),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Colors.grey[700])),
+                      style: TextStyle(color: Settings.noteItemDateColor)),
                   SizedBox(width: 8.0),
                   Flexible(
                     child: Container(
@@ -88,7 +89,7 @@ class NoteItemState extends State<NoteItem> {
                         _getSecondLineOfText(notePlainText),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.grey[500]),
+                        style: TextStyle(color: Settings.noteItemAlternativeTitleColor),
                       ),
                     ),
                   )
@@ -100,7 +101,6 @@ class NoteItemState extends State<NoteItem> {
       ),
     );
 
-    // TODO: Implement build
   }
 
   // Nullable
@@ -117,15 +117,15 @@ class NoteItemState extends State<NoteItem> {
   }
 
   String _getFirstLineOfText(String noteText) {
-    return _getNotBlankLine(noteText, 0) ?? "New note";
+    return _getNotBlankLine(noteText, 0) ?? StringResources.noteItemDefaultTitle;
   }
 
   // Nullable
   String _getSecondLineOfText(String noteText) {
     if (_getNotBlankLine(noteText, 0) == null) {
-      return "Handwritten Note";
+      return StringResources.noteItemHandwrittenNoteTitle;
     } else {
-      return _getNotBlankLine(noteText, 1) ?? "No additional text";
+      return _getNotBlankLine(noteText, 1) ?? StringResources.noteItemDefaultAlternativeTitle;
     }
   }
 
@@ -137,13 +137,13 @@ class NoteItemState extends State<NoteItem> {
     switch (diffDays) {
       case 0:
         {
-          return DateFormat('HH:mm').format(dateTime);
+          return DateFormat(Settings.noteItemDateSameDayFormat).format(dateTime);
         }
         break;
 
       case 1:
         {
-          return "Yesterday";
+          return StringResources.noteItemYesterdayText;
         }
         break;
 
@@ -154,13 +154,13 @@ class NoteItemState extends State<NoteItem> {
       case 6:
       case 7:
         {
-          return DateFormat('EEEE').format(dateTime);
+          return DateFormat(Settings.noteItemDateWithinWeekFormat).format(dateTime);
         }
         break;
 
       default:
         {
-          return DateFormat('dd/MM/yyyy').format(dateTime);
+          return DateFormat(Settings.noteItemDateMoreThanWeekFormat).format(dateTime);
         }
         break;
     }
