@@ -62,7 +62,7 @@ class _NoteRouteState extends State<NoteRoute> {
     PainterController controller =
         new PainterController(widget.note != null ? widget.note.paths : null, compressionLevel: Settings.painterPathCompressionLevel);
     controller.thickness = 5.0;
-    controller.drawColor = Colors.amber
+    controller.drawColor = Settings.defaultColor.withAlpha(Settings.paintColorAlpha)
         .withAlpha(220); //TODO Use default colors list from paintpicker
     controller.backgroundColor = Colors.transparent;
     return controller;

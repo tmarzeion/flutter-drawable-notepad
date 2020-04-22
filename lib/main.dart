@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: StringResources.appTitle,
         theme: ThemeData(
-          primarySwatch: Settings.defaultColor.withAlpha(255), //Default color here
+          primarySwatch: Settings.defaultColor, //Default color here
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         home: ListRoute(),
