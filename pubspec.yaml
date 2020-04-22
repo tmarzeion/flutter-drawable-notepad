@@ -40,7 +40,7 @@ dependencies:
   painter:
     git:
       url: git://github.com/tmarzeion/painter.git
-      ref: b10e73139c202204b62bd2b9b220059d24b5cd34
+      ref: 9389b227ac00acedab16a150cf1f0af761a73443
 
 
   # The following adds the Cupertino Icons font to your application.
