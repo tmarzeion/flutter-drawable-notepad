@@ -99,7 +99,9 @@ class _PaintPickerState extends State<PaintPicker> {
     return FlatButton(
       child: Container(
           child: new PhysicalModel(
-            color: widget.painterController.eraseMode ? Colors.white : widget.painterController.drawColor,
+            color: widget.painterController.eraseMode
+                ? Colors.white
+                : widget.painterController.drawColor,
             borderRadius: new BorderRadius.circular(25.0),
             child: new Container(
               width: 25.0,
@@ -135,7 +137,9 @@ class _PaintPickerState extends State<PaintPicker> {
 
   _createEraserButton() {
     return FlatButton(
-      color: widget.painterController.eraseMode ? Colors.amber.withAlpha(150) : null,
+      color: widget.painterController.eraseMode
+          ? Colors.amber.withAlpha(150)
+          : null,
       child: Container(
           width: 50,
           height: 50,
@@ -167,12 +171,12 @@ class _PaintPickerState extends State<PaintPicker> {
         return Dialog(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          child: SingleChildScrollView(
-            child: BlockPicker(
-              pickerColor: widget.painterController.drawColor,
-              onColorChanged: changeColorAndDismissDialog,
-              availableColors: _defaultColors,
-            ),
+          child: BlockPicker(
+            pickerColor: widget.painterController.drawColor,
+            onColorChanged: changeColorAndDismissDialog,
+            availableColors: _defaultColors,
+            layoutBuilder: _getColorPickerLayoutBuilder,
+            itemBuilder: _getColorPickerItemBuilder,
           ),
         );
       },
@@ -200,8 +204,54 @@ class _PaintPickerState extends State<PaintPicker> {
   }
 
   void _refreshHistoryState() {
-    setState(() {
-    });
+    setState(() {});
+  }
+
+  static Widget _getColorPickerLayoutBuilder(
+      BuildContext context, List<Color> colors, PickerItem child) {
+    return Container(
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        direction: Axis.horizontal,
+        children: colors.map((Color color) => child(color)).toList(),
+      ),
+    );
+  }
+
+  static Widget _getColorPickerItemBuilder(
+      Color color, bool isCurrentColor, Function changeColor) {
+    return Container(
+      width: 50,
+      height: 50,
+      margin: EdgeInsets.all(5.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(50.0),
+        color: color,
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.8),
+            offset: Offset(1.0, 2.0),
+            blurRadius: 3.0,
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: changeColor,
+          borderRadius: BorderRadius.circular(50.0),
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 210),
+            opacity: isCurrentColor ? 1.0 : 0.0,
+            child: Icon(
+              Icons.done,
+              color: useWhiteForeground(color) ? Colors.white : Colors.black,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
