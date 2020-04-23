@@ -12,7 +12,5 @@ TODO:
 - Tests + CI
 - Architecture refactor (DI, State management, clean arch)
 - Share feature
-- Draw mode setting bar state persitance
-
-Bugs:
-- Tapping without drag in draw mode should draw dots. currently it draws nothing, but still triggering undo button.
+- Save note on-fly
+- Draw mode setting bar state persistance
