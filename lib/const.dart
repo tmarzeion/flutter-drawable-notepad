@@ -64,6 +64,8 @@ class Settings {
   static String noteItemDateWithinWeekFormat = 'EEEE';
   static String noteItemDateMoreThanWeekFormat = 'dd/MM/yyyy';
 
+  static var saveNoteTimerDurationMillis = 1000;
+
 }
 
 class StringResources {

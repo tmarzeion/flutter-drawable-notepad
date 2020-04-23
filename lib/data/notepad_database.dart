@@ -21,7 +21,7 @@ class NotepadDatabase extends _$NotepadDatabase {
 
   Future<List<Note>> getAllNotes() => select(notes).get();
   Stream<List<Note>> watchAllNotes() => select(notes).watch();
-  Future insertNote(Note note) => into(notes).insert(note);
+  Future<int> insertNote(Note note) => into(notes).insert(note);
   Future updateNote(Note note) => update(notes).replace(note);
   Future deleteNote(Note note) => delete(notes).delete(note);
 

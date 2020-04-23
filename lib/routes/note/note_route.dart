@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
@@ -29,8 +30,10 @@ class _NoteRouteState extends State<NoteRoute> {
   PainterController _painterController;
   DrawModeController _drawModeController;
 
-  /// For zefyr
+  // For zefyr
   FocusNode _focusNode;
+
+  Timer saveNoteTimer;
 
   // Keys
   final _fontPickerKey = GlobalKey<FontPickerMenuItemState>();
@@ -45,6 +48,7 @@ class _NoteRouteState extends State<NoteRoute> {
     _zefyrController = ZefyrController(document,
         onToolbarVisibilityChange: (visible) =>
             {_drawModeController.onFontPickerVisibilityChanged(visible)});
+    _zefyrController.addListener(startSaveNoteTimer);
     _focusNode = FocusNode();
 
     // Init painter
@@ -62,9 +66,9 @@ class _NoteRouteState extends State<NoteRoute> {
     PainterController controller =
         new PainterController(widget.note != null ? widget.note.paths : null, compressionLevel: Settings.painterPathCompressionLevel);
     controller.thickness = 5.0;
-    controller.drawColor = Settings.defaultColor.withAlpha(Settings.paintColorAlpha)
-        .withAlpha(220); //TODO Use default colors list from paintpicker
+    controller.drawColor = Settings.defaultColor.withAlpha(Settings.paintColorAlpha);
     controller.backgroundColor = Colors.transparent;
+    controller.setOnDrawStepListener(startSaveNoteTimer);
     return controller;
   }
 
@@ -119,8 +123,19 @@ class _NoteRouteState extends State<NoteRoute> {
   }
 
   Future<bool> _onWillPop() async {
+    saveNoteTimer?.cancel();
+    return _saveNote(isPopping: true);
+  }
 
-    if (_drawModeController.isDrawMode()) return true;
+  startSaveNoteTimer() {
+    saveNoteTimer?.cancel();
+    saveNoteTimer = new Timer(Duration(milliseconds: Settings.saveNoteTimerDurationMillis), () => {
+      _saveNote()
+    });
+  }
+
+  Future<bool> _saveNote({isPopping = false}) async {
+    if (_drawModeController.isDrawMode() && isPopping) return true;
 
     /// Loads the document to be edited in Zefyr.
     final database = Provider.of<NotepadDatabase>(context, listen: false);
@@ -131,17 +146,21 @@ class _NoteRouteState extends State<NoteRoute> {
       final noteText = jsonEncode(_zefyrController.document);
       if (widget.note != null) {
         if (widget.note.noteText != noteText || widget.note.paths != paintHistory) {
-          database.updateNote(widget.note
-              .copyWith(noteText: noteText, paths: paintHistory == null ? "[]" : paintHistory));
+          var newNote = widget.note
+              .copyWith(noteText: noteText, paths: paintHistory == null ? "[]" : paintHistory);
+          database.updateNote(newNote);
+          widget.note = newNote;
         }
       } else {
-        database.insertNote(Note(
+        var newNote = Note(
             noteText: noteText,
             noteDate: new DateTime.now(),
-            paths: paintHistory));
+            paths: paintHistory);
+        var noteId = await database.insertNote(newNote);
+        widget.note = newNote.copyWith(id: noteId);
       }
     } else {
-      if (widget.note != null) {
+      if (widget.note != null && isPopping) {
         database.deleteNote(widget.note);
       }
     }
