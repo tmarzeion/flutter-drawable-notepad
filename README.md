@@ -4,13 +4,18 @@
 
 Flutter reimplementation of existing [Drawable Notepad App](https://github.com/tmarzeion/drawable-notepad)
 
+Features:
+- Rich-text editor
+- Drawing on notes
+- Saving/Updating/Removing notes
+- Saving notes on-fly
+- Draw mode setting bar state persistance
+
 TODO:
 - Drawing history optimization (don't redraw whole history with every ui update)
 - Search feature
 - Translation
-- Design (icons etc.)
 - Tests + CI
 - Architecture refactor (DI, State management, clean arch)
 - Share feature
-- Save note on-fly
-- Draw mode setting bar state persistance
+- Save setting of drawing/typing

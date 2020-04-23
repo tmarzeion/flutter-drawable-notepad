@@ -7,6 +7,7 @@ class Notes extends Table {
   TextColumn get paths => text().nullable()();
   TextColumn get noteText => text().withLength(min: 1, max: 16384)();
   DateTimeColumn get noteDate => dateTime()();
+  TextColumn get noteSettings => text()();
 }
 
 @UseMoor(tables: [Notes])

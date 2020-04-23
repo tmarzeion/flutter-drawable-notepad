@@ -5,10 +5,11 @@ import 'package:painter/painter.dart';
 import 'paint_picker.dart';
 
 class PaintPickerMenuItem extends StatefulWidget {
-  PaintPickerMenuItem({Key key, this.onPressed, this.painterController}) : super(key: key);
+  PaintPickerMenuItem({Key key, this.onPressed, this.painterController, this.onUpdateNoteSettingsListener}) : super(key: key);
 
   final Function onPressed;
   final PainterController painterController;
+  final Function onUpdateNoteSettingsListener;
 
   @override
   State createState() => PaintPickerMenuItemState();
@@ -44,7 +45,7 @@ class PaintPickerMenuItemState extends State<PaintPickerMenuItem>
   void open() {
     setState(() {
       bottomSheetController =
-          showBottomSheet(context: context, builder: (context) => PaintPicker(widget.painterController));
+          showBottomSheet(context: context, builder: (context) => PaintPicker(widget.painterController, onUpdateNoteSettingsListener: widget.onUpdateNoteSettingsListener,));
       bottomSheetController.closed.then((value) => {bottomSheetOpen = false});
       bottomSheetOpen = true;
     });

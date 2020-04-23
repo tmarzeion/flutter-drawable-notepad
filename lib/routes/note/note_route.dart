@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:drawablenotepadflutter/data/NoteSettingsConverter.dart';
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:drawablenotepadflutter/routes/note/views/font_picker_menu_item.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,6 @@ class NoteRoute extends StatefulWidget {
 }
 
 class _NoteRouteState extends State<NoteRoute> {
-
   // Controllers
   ZefyrController _zefyrController;
   PainterController _painterController;
@@ -58,15 +58,25 @@ class _NoteRouteState extends State<NoteRoute> {
     _drawModeController = DrawModeController(
         fontPickerKey: _fontPickerKey,
         paintPickerkey: _paintPickerkey,
-        onToolbarStateChanged: () => setState(() {}));
+        onToolbarStateChanged: () => setState(() {
+          startSaveNoteTimer();
+        }));
   }
 
   // TODO: Provide it via DI
   PainterController _getPainterController() {
-    PainterController controller =
-        new PainterController(widget.note != null ? widget.note.paths : null, compressionLevel: Settings.painterPathCompressionLevel);
-    controller.thickness = 5.0;
-    controller.drawColor = Settings.defaultColor.withAlpha(Settings.paintColorAlpha);
+    PainterController controller = new PainterController(
+        widget.note != null ? widget.note.paths : null,
+        compressionLevel: Settings.painterPathCompressionLevel);
+    if (widget.note != null) {
+      NoteSettings settings = NoteSettingsConverter.fromNote(widget.note);
+      controller.thickness = settings.paintThickness;
+      controller.drawColor = Color.fromARGB(Settings.paintColorAlpha, settings.paintR, settings.paintG, settings.paintB);
+    } else {
+      controller.thickness = Settings.drawThicknessModes[Settings.defaultThicknessMode].thickness;
+      controller.drawColor =
+          Settings.defaultColor.withAlpha(Settings.paintColorAlpha);
+    }
     controller.backgroundColor = Colors.transparent;
     controller.setOnDrawStepListener(startSaveNoteTimer);
     return controller;
@@ -93,7 +103,8 @@ class _NoteRouteState extends State<NoteRoute> {
             PaintPickerMenuItem(
                 key: _paintPickerkey,
                 painterController: _painterController,
-                onPressed: _drawModeController.togglePaintPicker)
+                onPressed: _drawModeController.togglePaintPicker,
+                onUpdateNoteSettingsListener: startSaveNoteTimer)
           ],
         ),
         body: Stack(
@@ -129,9 +140,9 @@ class _NoteRouteState extends State<NoteRoute> {
 
   startSaveNoteTimer() {
     saveNoteTimer?.cancel();
-    saveNoteTimer = new Timer(Duration(milliseconds: Settings.saveNoteTimerDurationMillis), () => {
-      _saveNote()
-    });
+    saveNoteTimer = new Timer(
+        Duration(milliseconds: Settings.saveNoteTimerDurationMillis),
+        () => {_saveNote()});
   }
 
   Future<bool> _saveNote({isPopping = false}) async {
@@ -141,13 +152,19 @@ class _NoteRouteState extends State<NoteRoute> {
     final database = Provider.of<NotepadDatabase>(context, listen: false);
 
     String paintHistory = _painterController.history;
+    String noteSettings = _getCurrentNoteSettings();
 
-    if (isNotBlank(_zefyrController.document.toPlainText()) || paintHistory.length >= 3) {
+    if (isNotBlank(_zefyrController.document.toPlainText()) ||
+        paintHistory.length >= 3) {
       final noteText = jsonEncode(_zefyrController.document);
       if (widget.note != null) {
-        if (widget.note.noteText != noteText || widget.note.paths != paintHistory) {
-          var newNote = widget.note
-              .copyWith(noteText: noteText, paths: paintHistory == null ? "[]" : paintHistory);
+        if (widget.note.noteText != noteText ||
+            widget.note.paths != paintHistory ||
+        widget.note.noteSettings != noteSettings) {
+          var newNote = widget.note.copyWith(
+              noteText: noteText,
+              paths: paintHistory == null ? "[]" : paintHistory,
+              noteSettings: _getCurrentNoteSettings());
           database.updateNote(newNote);
           widget.note = newNote;
         }
@@ -155,6 +172,7 @@ class _NoteRouteState extends State<NoteRoute> {
         var newNote = Note(
             noteText: noteText,
             noteDate: new DateTime.now(),
+            noteSettings: _getCurrentNoteSettings(),
             paths: paintHistory);
         var noteId = await database.insertNote(newNote);
         widget.note = newNote.copyWith(id: noteId);
@@ -165,6 +183,15 @@ class _NoteRouteState extends State<NoteRoute> {
       }
     }
     return true;
+  }
+
+  String _getCurrentNoteSettings() {
+    return json.encode(NoteSettings(
+        _drawModeController.isDrawMode(),
+        _painterController.drawColor.red,
+        _painterController.drawColor.green,
+        _painterController.drawColor.blue,
+        _painterController.thickness));
   }
 
   /// Loads the document to be edited in Zefyr.

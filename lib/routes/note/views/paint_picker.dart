@@ -8,8 +8,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:painter/painter.dart';
 
 class PaintPicker extends StatefulWidget {
-  PaintPicker(this.painterController, {Key key}) : super(key: key);
+  PaintPicker(this.painterController,
+      {Key key, this.onUpdateNoteSettingsListener})
+      : super(key: key);
 
+  final Function onUpdateNoteSettingsListener;
   final PainterController painterController;
 
   @override
@@ -17,12 +20,13 @@ class PaintPicker extends StatefulWidget {
 }
 
 class _PaintPickerState extends State<PaintPicker> {
-  int currentThicknessMode = Settings.defaultThicknessMode;
+  int currentThicknessMode;
 
   void changeColorAndDismissDialog(Color color) {
     setState(() {
       widget.painterController.drawColor = color;
       widget.painterController.eraseMode = false;
+      widget?.onUpdateNoteSettingsListener?.call();
       Navigator.pop(context);
     });
   }
@@ -30,6 +34,8 @@ class _PaintPickerState extends State<PaintPicker> {
   @override
   void initState() {
     super.initState();
+    currentThicknessMode = Settings.drawThicknessModes.indexWhere(
+        (element) => element.thickness == widget.painterController.thickness);
     widget.painterController.setOnHistoryUpdatedListener(_refreshHistoryState);
   }
 
@@ -146,6 +152,7 @@ class _PaintPickerState extends State<PaintPicker> {
 
   void _undoPaintStep() {
     widget.painterController.undo();
+    widget?.onUpdateNoteSettingsListener?.call();
     _refreshHistoryState();
   }
 
@@ -224,11 +231,13 @@ class _PaintPickerState extends State<PaintPicker> {
   void _clear() {
     widget.painterController.clear();
     widget.painterController.eraseMode = false;
+    widget?.onUpdateNoteSettingsListener?.call();
     setState(() {});
   }
 
   void _changeThickness() {
     currentThicknessMode++;
+    widget?.onUpdateNoteSettingsListener?.call();
     setState(() {
       currentThicknessMode =
           currentThicknessMode % Settings.drawThicknessModes.length;
