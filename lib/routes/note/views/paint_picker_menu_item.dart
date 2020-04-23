@@ -1,15 +1,17 @@
 import 'package:drawablenotepadflutter/routes/note/menu_items_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:painter/painter.dart';
 
 import 'paint_picker.dart';
 
 class PaintPickerMenuItem extends StatefulWidget {
-  PaintPickerMenuItem({Key key, this.onPressed, this.painterController, this.onUpdateNoteSettingsListener}) : super(key: key);
+  PaintPickerMenuItem({Key key, this.onPressed, this.painterController, this.onUpdateNoteSettingsListener, this.openOnStart}) : super(key: key);
 
   final Function onPressed;
   final PainterController painterController;
   final Function onUpdateNoteSettingsListener;
+  final bool openOnStart;
 
   @override
   State createState() => PaintPickerMenuItemState();
@@ -17,6 +19,7 @@ class PaintPickerMenuItem extends StatefulWidget {
 
 class PaintPickerMenuItemState extends State<PaintPickerMenuItem>
     implements Closeable {
+  bool initialized = false;
   bool bottomSheetOpen = false;
   PersistentBottomSheetController bottomSheetController;
 
@@ -29,6 +32,15 @@ class PaintPickerMenuItemState extends State<PaintPickerMenuItem>
         setState(widget.onPressed);
       },
     );
+  }
+
+  void initState() {
+    super.initState();
+    if (widget.openOnStart && !initialized) {
+      SchedulerBinding.instance
+          .addPostFrameCallback((_) => open());
+    }
+    initialized = true;
   }
 
   @override

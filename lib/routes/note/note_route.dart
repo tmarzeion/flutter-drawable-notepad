@@ -59,8 +59,8 @@ class _NoteRouteState extends State<NoteRoute> {
         fontPickerKey: _fontPickerKey,
         paintPickerkey: _paintPickerkey,
         onToolbarStateChanged: () => setState(() {
-          startSaveNoteTimer();
-        }));
+              startSaveNoteTimer();
+            }));
   }
 
   // TODO: Provide it via DI
@@ -71,9 +71,11 @@ class _NoteRouteState extends State<NoteRoute> {
     if (widget.note != null) {
       NoteSettings settings = NoteSettingsConverter.fromNote(widget.note);
       controller.thickness = settings.paintThickness;
-      controller.drawColor = Color.fromARGB(Settings.paintColorAlpha, settings.paintR, settings.paintG, settings.paintB);
+      controller.drawColor = Color.fromARGB(Settings.paintColorAlpha,
+          settings.paintR, settings.paintG, settings.paintB);
     } else {
-      controller.thickness = Settings.drawThicknessModes[Settings.defaultThicknessMode].thickness;
+      controller.thickness =
+          Settings.drawThicknessModes[Settings.defaultThicknessMode].thickness;
       controller.drawColor =
           Settings.defaultColor.withAlpha(Settings.paintColorAlpha);
     }
@@ -99,12 +101,15 @@ class _NoteRouteState extends State<NoteRoute> {
               key: _fontPickerKey,
               onPressed: _drawModeController.toggleFontPicker,
               focusNode: _focusNode,
+              openOnStart: widget.note != null ? false : true,
             ),
             PaintPickerMenuItem(
                 key: _paintPickerkey,
                 painterController: _painterController,
                 onPressed: _drawModeController.togglePaintPicker,
-                onUpdateNoteSettingsListener: startSaveNoteTimer)
+                onUpdateNoteSettingsListener: startSaveNoteTimer,
+                openOnStart:
+                    widget.note != null ? NoteSettingsConverter.fromNote(widget.note).drawMode : false)
           ],
         ),
         body: Stack(
@@ -160,7 +165,7 @@ class _NoteRouteState extends State<NoteRoute> {
       if (widget.note != null) {
         if (widget.note.noteText != noteText ||
             widget.note.paths != paintHistory ||
-        widget.note.noteSettings != noteSettings) {
+            widget.note.noteSettings != noteSettings) {
           var newNote = widget.note.copyWith(
               noteText: noteText,
               paths: paintHistory == null ? "[]" : paintHistory,

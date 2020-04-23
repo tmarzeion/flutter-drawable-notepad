@@ -4,8 +4,9 @@ import '../menu_items_controller.dart';
 
 class FontPickerMenuItem extends StatefulWidget {
 
-  FontPickerMenuItem({Key key, this.onPressed, this.focusNode}) : super(key: key);
+  FontPickerMenuItem({Key key, this.onPressed, this.focusNode, this.openOnStart}) : super(key: key);
 
+  final bool openOnStart;
   final FocusNode focusNode;
   final Function onPressed;
 
@@ -15,12 +16,17 @@ class FontPickerMenuItem extends StatefulWidget {
 
 class FontPickerMenuItemState extends State<FontPickerMenuItem> implements Closeable {
 
-  bool isOpen = true; //Visible on start | TODO: :)
-  PersistentBottomSheetController bottomSheetController;
+  bool isOpen;
+
+  @override
+  void initState() {
+    isOpen = widget.openOnStart;
+  }
 
   @override
   Widget build(BuildContext context) {
     var color = isOpen ? Colors.white : Colors.black; // TODO better design later
+    if (!isOpen) close();
     return IconButton(
       icon: Icon(Icons.text_fields, color: color),
       onPressed: () {

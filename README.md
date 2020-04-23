@@ -19,3 +19,4 @@ TODO:
 - Architecture refactor (DI, State management, clean arch)
 - Share feature
 - Save setting of drawing/typing
+- Long press / Force click on note item -> Modal preview

@@ -47,6 +47,14 @@ class DrawModeController {
     paintPickerkey.currentState.close();
   }
 
+  openPaintPicker() {
+    paintPickerkey?.currentState?.open();
+  }
+
+  openFontPicker() {
+    fontPickerKey?.currentState?.open();
+  }
+
   toggleFontPicker() {
     _toggleCloseable(fontPickerKey.currentState);
     _hidePaintPicker();
