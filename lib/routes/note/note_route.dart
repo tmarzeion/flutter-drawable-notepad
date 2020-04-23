@@ -13,6 +13,7 @@ import 'package:quiver/strings.dart';
 
 import '../../const.dart';
 import 'menu_items_controller.dart';
+import 'views/paint_picker.dart';
 import 'views/paint_picker_menu_item.dart';
 
 class NoteRoute extends StatefulWidget {
@@ -35,9 +36,11 @@ class _NoteRouteState extends State<NoteRoute> {
 
   Timer saveNoteTimer;
 
+  bool initialized = false;
+
   // Keys
-  final _fontPickerKey = GlobalKey<FontPickerMenuItemState>();
-  final _paintPickerkey = GlobalKey<PaintPickerMenuItemState>();
+  final _fontPickerMenuKey = GlobalKey<FontPickerMenuItemState>();
+  final _paintPickerMenuKey = GlobalKey<PaintPickerMenuItemState>();
 
   @override
   void initState() {
@@ -56,8 +59,8 @@ class _NoteRouteState extends State<NoteRoute> {
 
     // Init mode controller
     _drawModeController = DrawModeController(
-        fontPickerKey: _fontPickerKey,
-        paintPickerkey: _paintPickerkey,
+        fontPickerKey: _fontPickerMenuKey,
+        paintPickerKey: _paintPickerMenuKey,
         onToolbarStateChanged: () => setState(() {
               startSaveNoteTimer();
             }));
@@ -88,34 +91,44 @@ class _NoteRouteState extends State<NoteRoute> {
   Widget build(BuildContext context) {
     // Note that the editor requires special `ZefyrScaffold` widget to be
     // one of its parents.
+    bool shouldIgnoreTextEditorClicks = _drawModeController.isDrawMode();
+    bool shouldIgnorePainterClicks = _drawModeController.isTextMode();
+
+    if (!initialized) {
+      if (widget.note != null) {
+        var initialDrawModeOn = NoteSettingsConverter.fromNote(widget.note).drawMode;
+        shouldIgnoreTextEditorClicks = initialDrawModeOn;
+        shouldIgnorePainterClicks = !initialDrawModeOn;
+      }
+    }
     final double bottomPainterPadding = _drawModeController.bottomBarVisible()
         ? ZefyrToolbar.kToolbarHeight
         : 0.0;
-    return WillPopScope(
+    final view = WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
           title: Text("Note"),
           actions: <Widget>[
             FontPickerMenuItem(
-              key: _fontPickerKey,
+              key: _fontPickerMenuKey,
               onPressed: _drawModeController.toggleFontPicker,
               focusNode: _focusNode,
               openOnStart: widget.note != null ? false : true,
             ),
             PaintPickerMenuItem(
-                key: _paintPickerkey,
+                key: _paintPickerMenuKey,
                 painterController: _painterController,
                 onPressed: _drawModeController.togglePaintPicker,
-                onUpdateNoteSettingsListener: startSaveNoteTimer,
-                openOnStart:
-                    widget.note != null ? NoteSettingsConverter.fromNote(widget.note).drawMode : false)
+                openOnStart: widget.note != null
+                    ? NoteSettingsConverter.fromNote(widget.note).drawMode
+                    : false)
           ],
         ),
         body: Stack(
           children: [
             IgnorePointer(
-              ignoring: _drawModeController.isDrawMode(),
+              ignoring: shouldIgnoreTextEditorClicks,
               child: ZefyrScaffold(
                 child: ZefyrEditor(
                   padding: EdgeInsets.all(16),
@@ -125,17 +138,31 @@ class _NoteRouteState extends State<NoteRoute> {
               ),
             ),
             IgnorePointer(
-              ignoring: _drawModeController.isTextMode(),
+              ignoring: shouldIgnorePainterClicks,
               child: Padding(
                 padding: EdgeInsets.only(bottom: bottomPainterPadding),
                 child:
-                    Opacity(opacity: 0.6, child: Painter(_painterController)),
+                Opacity(opacity: 0.6, child: Painter(_painterController)),
+              ),
+            ),
+            Visibility(
+              visible: shouldIgnoreTextEditorClicks,
+              child: Expanded(
+                child: Align(
+                  alignment: AlignmentDirectional.bottomCenter,
+                  child: Container(
+                      height: Settings.bottomBarHeight,
+                      child: PaintPicker(_painterController,
+                          onUpdateNoteSettingsListener: startSaveNoteTimer)),
+                ),
               ),
             )
           ],
         ),
       ),
     );
+    initialized = true;
+    return view;
   }
 
   Future<bool> _onWillPop() async {
@@ -151,7 +178,6 @@ class _NoteRouteState extends State<NoteRoute> {
   }
 
   Future<bool> _saveNote({isPopping = false}) async {
-    if (_drawModeController.isDrawMode() && isPopping) return true;
 
     /// Loads the document to be edited in Zefyr.
     final database = Provider.of<NotepadDatabase>(context, listen: false);

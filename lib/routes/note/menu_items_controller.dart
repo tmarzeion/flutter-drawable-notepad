@@ -4,29 +4,29 @@ import 'package:flutter/widgets.dart';
 
 class DrawModeController {
 
-  DrawModeController({this.fontPickerKey, this.paintPickerkey, this.onToolbarStateChanged});
+  DrawModeController({this.fontPickerKey, this.paintPickerKey, this.onToolbarStateChanged});
 
   GlobalKey<FontPickerMenuItemState> fontPickerKey;
-  GlobalKey<PaintPickerMenuItemState> paintPickerkey;
+  GlobalKey<PaintPickerMenuItemState> paintPickerKey;
   Function onToolbarStateChanged;
 
   bool bottomBarVisible() {
-    if(fontPickerKey.currentState?.getState() != null && paintPickerkey.currentState?.getState() != null) {
-      return fontPickerKey.currentState.getState() || paintPickerkey.currentState.getState();
+    if(fontPickerKey.currentState?.getState() != null && paintPickerKey.currentState?.getState() != null) {
+      return fontPickerKey.currentState.getState() || paintPickerKey.currentState.getState();
     }
     return false;
   }
 
   bool isDrawMode() {
-    if (paintPickerkey.currentState?.getState() != null) {
-      return paintPickerkey.currentState.getState();
+    if (paintPickerKey.currentState?.getState() != null) {
+      return paintPickerKey.currentState.getState();
     }
     return false;
   }
 
   bool isTextMode() {
-    if (paintPickerkey.currentState?.getState() != null) {
-      return !paintPickerkey.currentState.getState();
+    if (paintPickerKey.currentState?.getState() != null) {
+      return !paintPickerKey.currentState.getState();
     }
     return true;
   }
@@ -44,11 +44,11 @@ class DrawModeController {
   }
 
   _hidePaintPicker() {
-    paintPickerkey.currentState.close();
+    paintPickerKey.currentState.close();
   }
 
   openPaintPicker() {
-    paintPickerkey?.currentState?.open();
+    paintPickerKey?.currentState?.open();
   }
 
   openFontPicker() {
@@ -61,7 +61,7 @@ class DrawModeController {
   }
 
   togglePaintPicker() {
-    _toggleCloseable(paintPickerkey.currentState);
+    _toggleCloseable(paintPickerKey.currentState);
     _hideFontPicker();
     onToolbarStateChanged?.call();
   }
