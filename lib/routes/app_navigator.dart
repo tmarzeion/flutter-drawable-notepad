@@ -10,7 +10,7 @@ class AppNavigator {
   static void navigateToNoteEdit(BuildContext context, Note note) {
     Navigator.of(context)
         .push(MaterialPageRoute<Null>(builder: (BuildContext context) {
-      return NoteRoute(note: note);
+      return NoteRoute(note: note, previewMode: false,);
     }));
   }
 

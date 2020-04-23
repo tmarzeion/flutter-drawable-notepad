@@ -10,6 +10,8 @@ Features:
 - Saving/Updating/Removing notes
 - Saving notes on-fly
 - Draw mode setting bar state persistance
+- Saved setting of draw/text modes
+- Long press / Force click on note item -> Modal preview
 
 TODO:
 - Drawing history optimization (don't redraw whole history with every ui update)
@@ -18,5 +20,3 @@ TODO:
 - Tests + CI
 - Architecture refactor (DI, State management, clean arch)
 - Share feature
-- Save setting of drawing/typing
-- Long press / Force click on note item -> Modal preview

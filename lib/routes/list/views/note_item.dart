@@ -11,9 +11,10 @@ import 'package:quiver/strings.dart';
 import 'package:zefyr/zefyr.dart';
 
 class NoteItem extends StatefulWidget {
-  NoteItem({Key key, this.note}) : super(key: key);
+  NoteItem({Key key, this.note, this.onNotePreviewRequested}) : super(key: key);
 
   final Note note;
+  final Function onNotePreviewRequested;
 
   @override
   State<StatefulWidget> createState() {
@@ -56,51 +57,55 @@ class NoteItemState extends State<NoteItem> {
           onTap: () => database.deleteNote(widget.note),
         )
       ],
-      child: InkWell(
-        onTap: () => AppNavigator.navigateToNoteEdit(context, note),
-        child: Padding(
-          padding: const EdgeInsets.only(
-              top: 8.0, bottom: 8.0, left: 16.0, right: 16.0),
-          child: Column(
-            children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: Text(
-                  _getFirstLineOfText(notePlainText),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      color: Settings.noteItemTitleColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16),
-                ),
-              ),
-              SizedBox(height: 4.0),
-              Row(
+      child: GestureDetector(
+        onLongPress: () => {widget.onNotePreviewRequested(widget.note, true)},
+        onLongPressEnd: (d) =>
+            widget.onNotePreviewRequested(widget.note, false),
+        child: InkWell(
+            onTap: () => AppNavigator.navigateToNoteEdit(context, note),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  top: 8.0, bottom: 8.0, left: 16.0, right: 16.0),
+              child: Column(
                 children: [
-                  Text(_getDateTimeAsNonNerdText(note.noteDate),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      _getFirstLineOfText(notePlainText),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Settings.noteItemDateColor)),
-                  SizedBox(width: 8.0),
-                  Flexible(
-                    child: Container(
-                      child: Text(
-                        _getSecondLineOfText(notePlainText),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Settings.noteItemAlternativeTitleColor),
-                      ),
+                      style: TextStyle(
+                          color: Settings.noteItemTitleColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
                     ),
+                  ),
+                  SizedBox(height: 4.0),
+                  Row(
+                    children: [
+                      Text(_getDateTimeAsNonNerdText(note.noteDate),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: Settings.noteItemDateColor)),
+                      SizedBox(width: 8.0),
+                      Flexible(
+                        child: Container(
+                          child: Text(
+                            _getSecondLineOfText(notePlainText),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: Settings.noteItemAlternativeTitleColor),
+                          ),
+                        ),
+                      )
+                    ],
                   )
                 ],
-              )
-            ],
-          ),
-        ),
+              ),
+            )),
       ),
     );
-
   }
 
   // Nullable
@@ -117,7 +122,8 @@ class NoteItemState extends State<NoteItem> {
   }
 
   String _getFirstLineOfText(String noteText) {
-    return _getNotBlankLine(noteText, 0) ?? StringResources.noteItemDefaultTitle;
+    return _getNotBlankLine(noteText, 0) ??
+        StringResources.noteItemDefaultTitle;
   }
 
   // Nullable
@@ -125,7 +131,8 @@ class NoteItemState extends State<NoteItem> {
     if (_getNotBlankLine(noteText, 0) == null) {
       return StringResources.noteItemHandwrittenNoteTitle;
     } else {
-      return _getNotBlankLine(noteText, 1) ?? StringResources.noteItemDefaultAlternativeTitle;
+      return _getNotBlankLine(noteText, 1) ??
+          StringResources.noteItemDefaultAlternativeTitle;
     }
   }
 
@@ -137,7 +144,8 @@ class NoteItemState extends State<NoteItem> {
     switch (diffDays) {
       case 0:
         {
-          return DateFormat(Settings.noteItemDateSameDayFormat).format(dateTime);
+          return DateFormat(Settings.noteItemDateSameDayFormat)
+              .format(dateTime);
         }
         break;
 
@@ -154,13 +162,15 @@ class NoteItemState extends State<NoteItem> {
       case 6:
       case 7:
         {
-          return DateFormat(Settings.noteItemDateWithinWeekFormat).format(dateTime);
+          return DateFormat(Settings.noteItemDateWithinWeekFormat)
+              .format(dateTime);
         }
         break;
 
       default:
         {
-          return DateFormat(Settings.noteItemDateMoreThanWeekFormat).format(dateTime);
+          return DateFormat(Settings.noteItemDateMoreThanWeekFormat)
+              .format(dateTime);
         }
         break;
     }
