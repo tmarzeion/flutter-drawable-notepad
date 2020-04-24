@@ -13,11 +13,13 @@ class NotesList extends StatefulWidget {
   }
 }
 
-class NotesListState extends State<NotesList> {
+class NotesListState extends State<NotesList> with TickerProviderStateMixin {
   bool modalVisible = false;
   Note visibleNote;
 
-  var currentNoteRoute = null;
+  var currentNoteRoute;
+  AnimationController _animationCcontroller;
+  CurvedAnimation _animation;
 
   @override
   Widget build(BuildContext context) {
@@ -25,29 +27,30 @@ class NotesListState extends State<NotesList> {
       children: [
         _buildNotesList(),
         IgnorePointer(
-          ignoring: !modalVisible,
-          child: AnimatedOpacity(
-            onEnd: () => {
-              if (!modalVisible)
-                {
-                  setState(() => {currentNoteRoute = null})
-                }
-            },
-            opacity: modalVisible ? 1.0 : 0.0,
-            duration: Duration(milliseconds: 300),
-            child: Stack(
-              children: <Widget>[
-                Container(
-                  color: Color.fromARGB(100, 0, 0, 0),
-                ),
-                Transform.scale(
-                  scale: 0.8,
-                  child: currentNoteRoute,
-                ),
-              ],
-            ),
-          ),
-        ),
+            ignoring: !modalVisible,
+            child: AnimatedOpacity(
+              onEnd: () => {
+                if (!modalVisible)
+                  {
+                    setState(() => {currentNoteRoute = null})
+                  }
+              },
+              opacity: modalVisible ? 1.0 : 0.0,
+              duration: Duration(milliseconds: 300),
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                    color: Color.fromARGB(100, 0, 0, 0),
+                  ),
+                  if (currentNoteRoute != null)
+                    ScaleTransition(
+                      scale: _animation,
+                      alignment: Alignment.center,
+                      child: currentNoteRoute,
+                    )
+                ],
+              ),
+            )),
       ],
     );
   }
@@ -80,17 +83,30 @@ class NotesListState extends State<NotesList> {
     );
   }
 
+  refreshAnimation() {
+    _animationCcontroller?.dispose();
+    _animationCcontroller = AnimationController(
+        duration: const Duration(milliseconds: 300),
+        lowerBound: 0.7,
+        upperBound: 0.75,
+        vsync: this);
+    _animation =
+        CurvedAnimation(parent: _animationCcontroller, curve: Curves.easeInOutQuad);
+  }
+
   _showModal(Note note) {
     setState(() {
       currentNoteRoute = NoteRoute(note: note, previewMode: true);
       modalVisible = true;
+      refreshAnimation();
+      _animationCcontroller.forward();
     });
   }
 
   _cancelModal() {
     setState(() {
-      currentNoteRoute = null;
       modalVisible = false;
+      _animationCcontroller.reverse();
     });
   }
 }
