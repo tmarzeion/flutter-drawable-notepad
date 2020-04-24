@@ -1,5 +1,6 @@
 import 'package:drawablenotepadflutter/const.dart';
 import 'package:drawablenotepadflutter/routes/app_navigator.dart';
+import 'package:drawablenotepadflutter/translations.dart';
 import 'package:flutter/material.dart';
 
 import 'views/notes_list.dart';
@@ -17,7 +18,7 @@ class _ListRouteState extends State<ListRoute> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(StringResources.notesListRouteToolbarTitle),
+        title: Text(AppLocalizations.of(context).translate('notesListRouteToolbarTitle')),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.search),
@@ -29,7 +30,7 @@ class _ListRouteState extends State<ListRoute> {
       ),
       body: NotesList(),
       floatingActionButton: FloatingActionButton(
-        tooltip: StringResources.addNoteFABTooltip,
+        tooltip: AppLocalizations.of(context).translate('addNoteFABTooltip'),
         onPressed: () => AppNavigator.navigateToNoteEdit(context, null),
         child: Icon(Icons.add),
       ),

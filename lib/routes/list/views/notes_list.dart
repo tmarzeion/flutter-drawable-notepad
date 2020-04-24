@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:drawablenotepadflutter/routes/list/views/note_item.dart';
 import 'package:drawablenotepadflutter/routes/note/note_route.dart';
+import 'package:drawablenotepadflutter/translations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -164,7 +165,7 @@ class NotesListState extends State<NotesList> with TickerProviderStateMixin {
       print(bs64);
       setState(() {});
       await Share.file('Note', 'note.png', pngBytes, 'image/png',
-          text: StringResources.shareNoteText);
+          text: AppLocalizations.of(context).translate('shareNoteText'));
     } catch (e) {
       print(e);
     }

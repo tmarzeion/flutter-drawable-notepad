@@ -1,9 +1,11 @@
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'const.dart';
 import 'routes/list/list_route.dart';
+import 'translations.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,7 +19,17 @@ class MyApp extends StatelessWidget {
       // The single instance of NotepadDatabase
       create: (_) => NotepadDatabase(),
       child: MaterialApp(
-        title: StringResources.appTitle,
+        supportedLocales: [
+          Locale('en', 'US'),
+          Locale('pl'),
+        ],
+        localizationsDelegates: [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        title: "Drawble Notepad 2",// AppLocalizations.of(context).translate('appTitle'), //TODO This needs to be translated
         theme: ThemeData(
           primarySwatch: Settings.defaultColor, //Default color here
           visualDensity: VisualDensity.adaptivePlatformDensity,

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:drawablenotepadflutter/data/NoteSettingsConverter.dart';
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:drawablenotepadflutter/routes/note/views/font_picker_menu_item.dart';
+import 'package:drawablenotepadflutter/translations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:painter/painter.dart';
@@ -131,7 +132,7 @@ class _NoteRouteState extends State<NoteRoute> {
         appBar: widget.previewMode
             ? null
             : AppBar(
-                title: Text(StringResources.noteRouteToolbarTitle),
+                title: Text(AppLocalizations.of(context).translate('noteRouteToolbarTitle')),
                 actions: menuItems,
               ),
         body: Stack(

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:drawablenotepadflutter/const.dart';
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:drawablenotepadflutter/routes/app_navigator.dart';
+import 'package:drawablenotepadflutter/translations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -143,16 +144,16 @@ class NoteItemState extends State<NoteItem> {
 
   String _getFirstLineOfText(String noteText) {
     return _getNotBlankLine(noteText, 0) ??
-        StringResources.noteItemDefaultTitle;
+        AppLocalizations.of(context).translate('noteItemDefaultTitle');
   }
 
   // Nullable
   String _getSecondLineOfText(String noteText) {
     if (_getNotBlankLine(noteText, 0) == null) {
-      return StringResources.noteItemHandwrittenNoteTitle;
+      return AppLocalizations.of(context).translate('noteItemHandwrittenNoteTitle');
     } else {
       return _getNotBlankLine(noteText, 1) ??
-          StringResources.noteItemDefaultAlternativeTitle;
+          AppLocalizations.of(context).translate('noteItemDefaultAlternativeTitle');
     }
   }
 
@@ -171,7 +172,7 @@ class NoteItemState extends State<NoteItem> {
 
       case 1:
         {
-          return StringResources.noteItemYesterdayText;
+          return AppLocalizations.of(context).translate('noteItemYesterdayText');
         }
         break;
 

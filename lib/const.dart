@@ -69,34 +69,3 @@ class Settings {
   static var swipeDeleteBackgroundColor = Colors.red;
 
 }
-
-class StringResources {
-
-  static String appTitle = 'Drawable Notepad';
-
-  // Erase whole drawing functionality
-  static String eraseAlertTitle = "Are you sure?";
-  static String eraseAlertContent = "Long pressing erase button will clear the whole drawing";
-  static String eraseAlertYes = "Erase";
-  static String eraseAlertNo = "Cancel";
-
-  // Note list route
-  static String notesListRouteToolbarTitle = "Notepad";
-  static String noteRouteToolbarTitle = "Note";
-
-  static String addNoteFABTooltip = 'Add note';
-
-  static String noteItemDefaultTitle = "New note";
-  static String noteItemHandwrittenNoteTitle = "Handwritten Note";
-  static String noteItemDefaultAlternativeTitle = "No additional text";
-  static String noteItemYesterdayText = "Yesterday";
-
-  static String shareNoteText = 'Note from drawable notepad';
-
-  static String searchBarTypeToSearch = "Type to search";
-  static String searchBarNotFound = "No notes with \"%s\" text found";
-  static String tutorialClickHereToAddNewNote = "Click here to add new note";
-  static String tutorialLongPressForPreview = "Long press to show note preview";
-  static String tutorialSwipeToShareDelete = "Swipe to share/delete note";
-
-}

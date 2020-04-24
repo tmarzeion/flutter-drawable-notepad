@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:drawablenotepadflutter/const.dart';
+import 'package:drawablenotepadflutter/translations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -174,12 +175,12 @@ class _PaintPickerState extends State<PaintPicker> {
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: Text(StringResources.eraseAlertTitle),
-          content: Text(StringResources.eraseAlertContent),
+          title: Text(AppLocalizations.of(context).translate('eraseAlertTitle')),
+          content: Text(AppLocalizations.of(context).translate('eraseAlertContent')),
           actions: <Widget>[
             CupertinoDialogAction(
               child: Text(
-                StringResources.eraseAlertYes,
+                AppLocalizations.of(context).translate('eraseAlertYes'),
                 style: TextStyle(
                     color: Color.fromARGB(255, 255, 59, 48) // iOS Red color
                     ),
@@ -190,7 +191,7 @@ class _PaintPickerState extends State<PaintPicker> {
               },
             ),
             CupertinoDialogAction(
-              child: Text(StringResources.eraseAlertNo),
+              child: Text(AppLocalizations.of(context).translate('eraseAlertNo')),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -206,18 +207,18 @@ class _PaintPickerState extends State<PaintPicker> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(StringResources.eraseAlertTitle),
-          content: Text(StringResources.eraseAlertContent),
+          title: Text(AppLocalizations.of(context).translate('eraseAlertTitle')),
+          content: Text(AppLocalizations.of(context).translate('eraseAlertContent')),
           actions: <Widget>[
             FlatButton(
-              child: Text(StringResources.eraseAlertYes.toUpperCase()),
+              child: Text(AppLocalizations.of(context).translate('eraseAlertYes').toUpperCase()),
               onPressed: () async {
                 _clear();
                 Navigator.of(context).pop();
               },
             ),
             FlatButton(
-              child: Text(StringResources.eraseAlertNo.toUpperCase()),
+              child: Text(AppLocalizations.of(context).translate('eraseAlertNo').toUpperCase()),
               onPressed: () {
                 Navigator.of(context).pop();
               },

@@ -1,0 +1,20 @@
+{
+  "appTitle": "Szkicownik 2",
+  "eraseAlertTitle": "Na pewno?",
+  "eraseAlertContent": "Długie naciśnięcie przycisku gumki spowoduje wyczyszczenie rysunku",
+  "eraseAlertYes": "Wymaż",
+  "eraseAlertNo": "Anuluj",
+  "notesListRouteToolbarTitle": "Notatnik",
+  "noteRouteToolbarTitle": "Notatka",
+  "addNoteFABTooltip": "Dodaj notatkę",
+  "noteItemDefaultTitle": "Nowa notatka",
+  "noteItemHandwrittenNoteTitle": "Notatka graficzna",
+  "noteItemDefaultAlternativeTitle": "Brak dodatkowej treści",
+  "noteItemYesterdayText": "Wczoraj",
+  "shareNoteText": "Notatka ze Szkicownika",
+  "searchBarTypeToSearch": "Pisz aby wyszukać",
+  "searchBarNotFound": "Nie znaleziono notatek z \"%s\" w treści",
+  "tutorialClickHereToAddNewNote": "Kliknij tutaj aby dodać nową notatkę",
+  "tutorialLongPressForPreview": "Przytrzymaj długo, aby włączyć podgląd notatki",
+  "tutorialSwipeToShareDelete": "Przeciągnij w bok aby udostępnić lub usunąć notatkę"
+}
