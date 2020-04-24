@@ -109,12 +109,14 @@ class _NoteRouteState extends State<NoteRoute> {
 
     final menuItems = <Widget>[
       FontPickerMenuItem(
+        previewMode: widget.previewMode,
         key: _fontPickerMenuKey,
         onPressed: _drawModeController.toggleFontPicker,
         focusNode: _focusNode,
         openOnStart: widget.note != null || widget.previewMode ? false : true,
       ),
       PaintPickerMenuItem(
+          previewMode: widget.previewMode,
           key: _paintPickerMenuKey,
           painterController: _painterController,
           onPressed: _drawModeController.togglePaintPicker,
@@ -150,7 +152,7 @@ class _NoteRouteState extends State<NoteRoute> {
               ),
             ),
             IgnorePointer(
-              ignoring: shouldIgnorePainterClicks && widget.previewMode,
+              ignoring: shouldIgnorePainterClicks || widget.previewMode,
               child: Padding(
                 padding: EdgeInsets.only(bottom: bottomPainterPadding),
                 child:

@@ -4,8 +4,10 @@ import '../menu_items_controller.dart';
 
 class FontPickerMenuItem extends StatefulWidget {
 
-  FontPickerMenuItem({Key key, this.onPressed, this.focusNode, this.openOnStart}) : super(key: key);
 
+  FontPickerMenuItem({Key key, this.onPressed, this.focusNode, this.openOnStart, this.previewMode}) : super(key: key);
+
+  final bool previewMode;
   final bool openOnStart;
   final FocusNode focusNode;
   final Function onPressed;
@@ -29,7 +31,7 @@ class FontPickerMenuItemState extends State<FontPickerMenuItem> implements Close
     if (!isOpen) close();
     return IconButton(
       icon: Icon(Icons.text_fields, color: color),
-      onPressed: () {
+      onPressed: widget.previewMode ? null : () {
         setState(widget.onPressed);
       },
     );

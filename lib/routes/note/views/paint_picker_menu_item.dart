@@ -9,13 +9,15 @@ class PaintPickerMenuItem extends StatefulWidget {
       this.onPressed,
       this.painterController,
       this.openOnStart,
-      this.bottomBarWidget})
+      this.bottomBarWidget,
+      this.previewMode})
       : super(key: key);
 
   final Function onPressed;
   final PainterController painterController;
   final bool openOnStart;
   final Widget bottomBarWidget;
+  final bool previewMode;
 
   @override
   State createState() => PaintPickerMenuItemState();
@@ -32,7 +34,7 @@ class PaintPickerMenuItemState extends State<PaintPickerMenuItem>
         isOpen ? Colors.white : Colors.black; // TODO better design later
     return IconButton(
       icon: Icon(Icons.brush, color: color),
-      onPressed: () {
+      onPressed: widget.previewMode ? null : () {
         setState(widget.onPressed);
       },
     );
