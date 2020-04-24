@@ -33,6 +33,7 @@ dependencies:
   flutter_svg: ^0.17.4
   flutter_colorpicker: ^0.3.2
   json_serializable: ^3.3.0
+  esys_flutter_share: ^1.0.2
   zefyr:
     git:
       url: git://github.com/tmarzeion/zefyr.git

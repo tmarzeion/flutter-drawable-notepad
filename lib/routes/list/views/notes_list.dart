@@ -1,8 +1,14 @@
+import 'dart:convert';
+
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:drawablenotepadflutter/routes/list/views/note_item.dart';
 import 'package:drawablenotepadflutter/routes/note/note_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:esys_flutter_share/esys_flutter_share.dart';
+import 'dart:ui' as ui;
 
 import '../../../const.dart';
 
@@ -15,11 +21,15 @@ class NotesList extends StatefulWidget {
 
 class NotesListState extends State<NotesList> with TickerProviderStateMixin {
   bool modalVisible = false;
+  bool shareMode = false;
+  bool screenShootEffectVisibile = false;
   Note visibleNote;
 
   var currentNoteRoute;
-  AnimationController _animationCcontroller;
+  AnimationController _animationController;
   CurvedAnimation _animation;
+
+  GlobalKey _repaintKey = new GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +44,12 @@ class NotesListState extends State<NotesList> with TickerProviderStateMixin {
                   {
                     setState(() => {currentNoteRoute = null})
                   }
+                else
+                  {
+                    setState(() => {
+                          if (shareMode) {screenShootEffectVisibile = true}
+                        })
+                  }
               },
               opacity: modalVisible ? 1.0 : 0.0,
               duration: Duration(milliseconds: 300),
@@ -46,7 +62,30 @@ class NotesListState extends State<NotesList> with TickerProviderStateMixin {
                     ScaleTransition(
                       scale: _animation,
                       alignment: Alignment.center,
-                      child: currentNoteRoute,
+                      child: Stack(
+                        children: <Widget>[
+                          RepaintBoundary(
+                            key: _repaintKey,
+                            child: currentNoteRoute,
+                          ),
+                          AnimatedOpacity(
+                            opacity: screenShootEffectVisibile ? 1.0 : 0.0,
+                            duration: Duration(milliseconds: 100),
+                            onEnd: () => {
+                              if (screenShootEffectVisibile)
+                                {
+                                  setState(
+                                      () => {screenShootEffectVisibile = false})
+                                }
+                              else
+                                {_shareNote()}
+                            },
+                            child: Container(
+                              color: Colors.white,
+                            ),
+                          )
+                        ],
+                      ),
                     )
                 ],
               ),
@@ -69,8 +108,8 @@ class NotesListState extends State<NotesList> with TickerProviderStateMixin {
               return NoteItem(
                 key: ObjectKey(itemNote),
                 note: itemNote,
-                onNotePreviewRequested: (note, show) => {
-                  if (show) {_showModal(note)} else {_cancelModal()}
+                onNotePreviewRequested: (note, show, share) => {
+                  if (show) {_showModal(note, share)} else {_cancelModal(false)}
                 },
               );
             },
@@ -84,29 +123,51 @@ class NotesListState extends State<NotesList> with TickerProviderStateMixin {
   }
 
   refreshAnimation() {
-    _animationCcontroller?.dispose();
-    _animationCcontroller = AnimationController(
+    _animationController?.dispose();
+    _animationController = AnimationController(
         duration: const Duration(milliseconds: 300),
         lowerBound: 0.7,
         upperBound: 0.75,
         vsync: this);
-    _animation =
-        CurvedAnimation(parent: _animationCcontroller, curve: Curves.easeInOutQuad);
+    _animation = CurvedAnimation(
+        parent: _animationController, curve: Curves.easeInOutQuad);
   }
 
-  _showModal(Note note) {
+  _showModal(Note note, bool share) {
     setState(() {
+      refreshAnimation();
+      shareMode = share;
       currentNoteRoute = NoteRoute(note: note, previewMode: true);
       modalVisible = true;
-      refreshAnimation();
-      _animationCcontroller.forward();
+      _animationController.forward();
     });
   }
 
-  _cancelModal() {
+  _cancelModal(bool screenShootAnimate) {
     setState(() {
+      shareMode = false;
       modalVisible = false;
-      _animationCcontroller.reverse();
+      _animationController.reverse();
     });
+  }
+
+  Future<void> _shareNote() async {
+    try {
+      RenderRepaintBoundary boundary =
+          _repaintKey.currentContext.findRenderObject();
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ByteData byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      var pngBytes = byteData.buffer.asUint8List();
+      var bs64 = base64Encode(pngBytes);
+      print(pngBytes);
+      print(bs64);
+      setState(() {});
+      await Share.file('Note', 'note.png', pngBytes, 'image/png',
+          text: 'Note from drawable notepad');
+    } catch (e) {
+      print(e);
+    }
+    _cancelModal(true);
   }
 }

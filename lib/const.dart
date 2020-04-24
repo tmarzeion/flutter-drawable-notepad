@@ -52,7 +52,6 @@ class Settings {
   static const colorCircleItemSize = 50.0;
 
   static var swipeDeleteIconSize = 40.0;
-  static var swipeDeleteBackgroundColor = Colors.red.withAlpha(200);
   static var swipeDeleteIconColor = Colors.white;
 
   static var noteItemTitleColor = Colors.black;
@@ -65,6 +64,9 @@ class Settings {
   static String noteItemDateMoreThanWeekFormat = 'dd/MM/yyyy';
 
   static var saveNoteTimerDurationMillis = 1000;
+
+  static var swipeShareBackgroundColor = Colors.green;
+  static var swipeDeleteBackgroundColor = Colors.red;
 
 }
 

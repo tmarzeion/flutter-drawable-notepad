@@ -11,7 +11,7 @@ Features:
 - Saving notes on-fly
 - Draw mode setting bar state persistance
 - Saved setting of draw/text modes
-- Long press / Force click on note item -> Modal preview
+- Long press on note item -> Modal preview
 
 TODO:
 - Drawing history optimization (don't redraw whole history with every ui update)
@@ -20,3 +20,6 @@ TODO:
 - Tests + CI
 - Architecture refactor (DI, State management, clean arch)
 - Share feature
+
+BUGS:
+- First try of modal animation have bad performance.

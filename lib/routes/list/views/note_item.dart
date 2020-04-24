@@ -1,12 +1,14 @@
+import 'dart:typed_data';
+
 import 'package:drawablenotepadflutter/const.dart';
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:drawablenotepadflutter/routes/app_navigator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
-
 import 'package:quiver/strings.dart';
 import 'package:zefyr/zefyr.dart';
 
@@ -55,12 +57,30 @@ class NoteItemState extends State<NoteItem> {
           ),
           //icon: Icons.delete,
           onTap: () => database.deleteNote(widget.note),
+        ),
+        IconSlideAction(
+          color: Settings.swipeShareBackgroundColor,
+          iconWidget: Container(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.share,
+                  color: Settings.swipeDeleteIconColor,
+                  size: Settings.swipeDeleteIconSize,
+                )
+              ],
+            ),
+          ),
+          //icon: Icons.delete,
+          onTap: _shareNote,
         )
       ],
       child: GestureDetector(
-        onLongPress: () => {widget.onNotePreviewRequested(widget.note, true)},
+        onLongPress: () => {widget.onNotePreviewRequested(widget.note, true, false)},
         onLongPressEnd: (d) =>
-            widget.onNotePreviewRequested(widget.note, false),
+            widget.onNotePreviewRequested(widget.note, false, false),
         child: InkWell(
             onTap: () => AppNavigator.navigateToNoteEdit(context, note),
             child: Padding(
@@ -174,5 +194,9 @@ class NoteItemState extends State<NoteItem> {
         }
         break;
     }
+  }
+
+  Future<void> _shareNote() {
+    widget.onNotePreviewRequested(widget.note, true, true);
   }
 }
