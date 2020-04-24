@@ -164,7 +164,7 @@ class NotesListState extends State<NotesList> with TickerProviderStateMixin {
       print(bs64);
       setState(() {});
       await Share.file('Note', 'note.png', pngBytes, 'image/png',
-          text: 'Note from drawable notepad');
+          text: StringResources.shareNoteText);
     } catch (e) {
       print(e);
     }

@@ -81,7 +81,8 @@ class StringResources {
   static String eraseAlertNo = "Cancel";
 
   // Note list route
-  static String noteRouteToolbarTitle = "Notepad";
+  static String notesListRouteToolbarTitle = "Notepad";
+  static String noteRouteToolbarTitle = "Note";
 
   static String addNoteFABTooltip = 'Add note';
 
@@ -89,4 +90,13 @@ class StringResources {
   static String noteItemHandwrittenNoteTitle = "Handwritten Note";
   static String noteItemDefaultAlternativeTitle = "No additional text";
   static String noteItemYesterdayText = "Yesterday";
+
+  static String shareNoteText = 'Note from drawable notepad';
+
+  static String searchBarTypeToSearch = "Type to search";
+  static String searchBarNotFound = "No notes with \"%s\" text found";
+  static String tutorialClickHereToAddNewNote = "Click here to add new note";
+  static String tutorialLongPressForPreview = "Long press to show note preview";
+  static String tutorialSwipeToShareDelete = "Swipe to share/delete note";
+
 }

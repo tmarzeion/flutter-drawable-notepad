@@ -17,7 +17,7 @@ class _ListRouteState extends State<ListRoute> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(StringResources.noteRouteToolbarTitle),
+        title: Text(StringResources.notesListRouteToolbarTitle),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.search),

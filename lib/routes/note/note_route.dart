@@ -131,7 +131,7 @@ class _NoteRouteState extends State<NoteRoute> {
         appBar: widget.previewMode
             ? null
             : AppBar(
-                title: Text("Note"),
+                title: Text(StringResources.noteRouteToolbarTitle),
                 actions: menuItems,
               ),
         body: Stack(
