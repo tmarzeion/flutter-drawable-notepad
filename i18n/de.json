@@ -1,0 +1,20 @@
+{
+    "appTitle": "Zeichenblock 2",
+    "eraseAlertTitle": "Sind Sie sicher?",
+    "eraseAlertContent": "Langes Dr\u00fccken der L\u00f6schtaste l\u00f6scht die gesamte Zeichnung",
+    "eraseAlertYes": "L\u00f6schen",
+    "eraseAlertNo": "Abbrechen",
+    "notesListRouteToolbarTitle": "Notizblock",
+    "noteRouteToolbarTitle": "Notiz",
+    "addNoteFABTooltip": "Notiz hinzuf\u00fcgen",
+    "noteItemDefaultTitle": "Neue Notiz",
+    "noteItemHandwrittenNoteTitle": "Gezeichnete Notiz",
+    "noteItemDefaultAlternativeTitle": "Kein zus\u00e4tzlicher Text",
+    "noteItemYesterdayText": "Gestern",
+    "shareNoteText": "Notiz aus Zeichenblock",
+    "searchBarTypeToSearch": "Zum Suchen eintippen",
+    "searchBarNotFound": "Keine Notizen mit dem Text \u201e%s\u201c gefunden",
+    "tutorialClickHereToAddNewNote": "Hier klicken, um eine neue Notiz hinzuzuf\u00fcgen",
+    "tutorialLongPressForPreview": "Lange dr\u00fccken, um eine Vorschau der Notiz anzuzeigen",
+    "tutorialSwipeToShareDelete": "Wischen, um Notiz zu teilen \/ zu l\u00f6schen"
+}

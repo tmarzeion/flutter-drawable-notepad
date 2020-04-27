@@ -66,6 +66,11 @@ flutter:
     - assets/
     - i18n/en.json
     - i18n/pl.json
+    - i18n/de.json
+    - i18n/es.json
+    - i18n/fr.json
+    - i18n/ja.json
+    - i18n/ru.json
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
