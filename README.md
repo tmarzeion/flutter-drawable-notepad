@@ -13,11 +13,11 @@ Features:
 - Saved setting of draw/text modes
 - Long press on note item -> Modal preview
 - Share feature
+- Supported languages: English, Polish, German, Russian, French, Japanese, Spanish
 
 TODO:
 - Drawing history optimization (don't redraw whole history with every ui update)
 - Search feature
-- Translation
 - Tests + CI
 - Architecture refactor (DI, State management, clean arch)
 
