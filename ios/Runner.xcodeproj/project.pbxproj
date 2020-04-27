@@ -35,6 +35,18 @@
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		4094E4B824539B55009D8352 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Main.strings; sourceTree = "<group>"; };
 		4094E4B924539B55009D8352 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		40EC378A2456D3C500B8C551 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Main.strings; sourceTree = "<group>"; };
+		40EC378B2456D3C500B8C551 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		40EC378C2456D44300B8C551 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Main.strings; sourceTree = "<group>"; };
+		40EC378D2456D44400B8C551 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		40EC378E2456D44800B8C551 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
+		40EC378F2456D44800B8C551 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		40EC37902456D45000B8C551 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Main.strings; sourceTree = "<group>"; };
+		40EC37912456D45000B8C551 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		40EC37922456D45300B8C551 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/Main.strings"; sourceTree = "<group>"; };
+		40EC37932456D45300B8C551 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
+		40EC37942456D45F00B8C551 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Main.strings; sourceTree = "<group>"; };
+		40EC37952456D45F00B8C551 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		41A646328F838EB62EE912AF /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DD163B5BAF1BD9E71875CCD /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -182,6 +194,12 @@
 				en,
 				Base,
 				pl,
+				fr,
+				ja,
+				de,
+				es,
+				"es-419",
+				ru,
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
@@ -295,6 +313,12 @@
 			children = (
 				97C146FB1CF9000F007C117D /* Base */,
 				4094E4B824539B55009D8352 /* pl */,
+				40EC378A2456D3C500B8C551 /* fr */,
+				40EC378C2456D44300B8C551 /* ja */,
+				40EC378E2456D44800B8C551 /* de */,
+				40EC37902456D45000B8C551 /* es */,
+				40EC37922456D45300B8C551 /* es-419 */,
+				40EC37942456D45F00B8C551 /* ru */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -304,6 +328,12 @@
 			children = (
 				97C147001CF9000F007C117D /* Base */,
 				4094E4B924539B55009D8352 /* pl */,
+				40EC378B2456D3C500B8C551 /* fr */,
+				40EC378D2456D44400B8C551 /* ja */,
+				40EC378F2456D44800B8C551 /* de */,
+				40EC37912456D45000B8C551 /* es */,
+				40EC37932456D45300B8C551 /* es-419 */,
+				40EC37952456D45F00B8C551 /* ru */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
