@@ -1,4 +1,3 @@
-import 'package:drawablenotepadflutter/const.dart';
 import 'package:drawablenotepadflutter/routes/app_navigator.dart';
 import 'package:drawablenotepadflutter/translations.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,8 @@ import 'views/notes_list.dart';
 
 class ListRoute extends StatefulWidget {
   ListRoute({Key key}) : super(key: key);
+
+  static const String routeName = "ListRoute";
 
   @override
   _ListRouteState createState() => _ListRouteState();

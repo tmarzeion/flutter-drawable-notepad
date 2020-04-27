@@ -101,24 +101,78 @@ class NotesListState extends State<NotesList> with TickerProviderStateMixin {
       stream: database.watchAllNotes(),
       builder: (context, AsyncSnapshot snapshot) {
         final notes = snapshot.data ?? List();
-        return ListView.separated(
-            itemBuilder: (_, index) {
-              final itemNote = notes[snapshot.data.length -
-                  index -
-                  1]; //TODO Ugly workaroud for reversing list order, IDK how to make that on Moor level
-              return NoteItem(
-                key: ObjectKey(itemNote),
-                note: itemNote,
-                onNotePreviewRequested: (note, show, share) => {
-                  if (show) {_showModal(note, share)} else {_cancelModal(false)}
-                },
-              );
-            },
-            separatorBuilder: (context, index) => Divider(
-                  color: Settings.noteItemSeparatorColor,
-                  height: 0.0,
-                ),
-            itemCount: notes.length);
+
+
+        if (notes.length > 0) {
+          return ListView.separated(
+              itemBuilder: (_, index) {
+                final itemNote = notes[snapshot.data.length -
+                    index -
+                    1]; //TODO Ugly workaroud for reversing list order, IDK how to make that on Moor level
+                return NoteItem(
+                  key: ObjectKey(itemNote),
+                  note: itemNote,
+                  onNotePreviewRequested: (note, show, share) => {
+                    if (show)
+                      {_showModal(note, share)}
+                    else
+                      {_cancelModal(false)}
+                  },
+                );
+              },
+              separatorBuilder: (context, index) => Divider(
+                    color: Settings.noteItemSeparatorColor,
+                    height: 0.0,
+                  ),
+              itemCount: notes.length);
+        } else {
+          return AnimatedOpacity(
+            opacity: 1.0,
+            duration: Duration(milliseconds: 100),
+            child: Align(
+                alignment: Alignment.bottomRight,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Transform.rotate(
+                      angle: 6,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Text(AppLocalizations.of(context).translate('tutorialClickHereToAddNewNote'), style: TextStyle(
+                            fontSize: 20
+                        ),),
+                      ),
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 80, bottom: 40),
+                            child: Container(
+                              width: 130,
+                              height: 100,
+                              child: FittedBox(
+                                fit: BoxFit.fill,
+                                child: Image(
+                                  image: AssetImage("assets/arrow.png"),
+                                  width: 100,
+                                  height: 100,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                )),
+          );
+        }
       },
     );
   }

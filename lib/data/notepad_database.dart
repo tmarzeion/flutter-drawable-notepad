@@ -25,5 +25,4 @@ class NotepadDatabase extends _$NotepadDatabase {
   Future<int> insertNote(Note note) => into(notes).insert(note);
   Future updateNote(Note note) => update(notes).replace(note);
   Future deleteNote(Note note) => delete(notes).delete(note);
-
 }
