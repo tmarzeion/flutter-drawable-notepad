@@ -44,7 +44,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
 
     _animationLogoPositionController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
-    logoOffset = Tween<Offset>(begin: Offset.zero, end: Offset(0.0, -1.2))
+    logoOffset = Tween<Offset>(begin: Offset.zero, end: Offset(0.0, -1.1))
         .animate(_animationLogoPositionController.drive(
       CurveTween(curve: Curves.easeInQuart),
     ));
@@ -172,7 +172,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                 angle: -1.3,
                 child: Image(
                   image: AssetImage("assets/arrow.png"),
-                  width: 100,
+                  width: 80,
                   height: 100,
                 ),
               ),
