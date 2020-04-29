@@ -1,0 +1,20 @@
+{
+  "appTitle": "Tegne Notesblok 2",
+  "eraseAlertTitle": "Er du sikker?",
+  "eraseAlertContent": "Langt tryk op slet knap vil fjerne hele tegningen",
+  "eraseAlertYes": "Slet",
+  "eraseAlertNo": "Annuller",
+  "notesListRouteToolbarTitle": "Notesblok",
+  "noteRouteToolbarTitle": "Note",
+  "addNoteFABTooltip": "Tilføj note",
+  "noteItemDefaultTitle": "Ny note",
+  "noteItemHandwrittenNoteTitle": "Håndskrevet note",
+  "noteItemDefaultAlternativeTitle": "Ingen yderligere tekst",
+  "noteItemYesterdayText": "I går",
+  "shareNoteText": "Note fra tegne notesblok",
+  "searchBarTypeToSearch": "Tast for at søge",
+  "searchBarNotFound": "Ingen note med \"%s\" fundet",
+  "tutorialClickHereToAddNewNote": "Klik her for at tilføje en note",
+  "tutorialLongPressForPreview": "Langt tryk for at vise note udkast",
+  "tutorialSwipeToShareDelete": "Swipe for a dele/slette noten"
+}
