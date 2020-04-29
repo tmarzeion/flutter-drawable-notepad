@@ -1,6 +1,5 @@
 import 'package:drawablenotepadflutter/const.dart';
 import 'package:drawablenotepadflutter/routes/app_navigator.dart';
-import 'package:drawablenotepadflutter/routes/intro/intro_samples.dart';
 import 'package:drawablenotepadflutter/routes/list/views/note_item.dart';
 import 'package:drawablenotepadflutter/routes/note/note_route.dart';
 import 'package:drawablenotepadflutter/translations.dart';
@@ -8,15 +7,20 @@ import 'package:flutter/material.dart';
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
 
 class OnBoardingPage extends StatefulWidget {
+
+  OnBoardingPage({this.note});
+
+  Note note;
+
   @override
   _OnBoardingPageState createState() => _OnBoardingPageState();
+
 }
 
 class _OnBoardingPageState extends State<OnBoardingPage>
     with TickerProviderStateMixin {
-  Note note;
 
-  var currentNoteRoute;
+  var noteRoute;
   CurvedAnimation _animationModal;
   CurvedAnimation _animationLogoScale;
   AnimationController _animationModalController;
@@ -28,6 +32,9 @@ class _OnBoardingPageState extends State<OnBoardingPage>
 
   @override
   void initState() {
+
+    noteRoute = NoteRoute(note: widget.note, previewMode: true);
+
     _animationModalController = AnimationController(
         duration: const Duration(milliseconds: 300),
         lowerBound: 0.7,
@@ -93,13 +100,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
         ),
       ),
     ));
-
-    Widget noteItem;
-    if (note != null) {
-      currentNoteRoute = NoteRoute(note: note, previewMode: true);
-      noteItem = NoteItem(
-          note: note, demoMode: true, onNotePreviewRequested: _previewNote);
-    }
+    
     notesItems.add(Stack(
       children: <Widget>[
         Container(
@@ -108,9 +109,10 @@ class _OnBoardingPageState extends State<OnBoardingPage>
         ),
         Container(
             child: AnimatedOpacity(
-                opacity: note == null ? 0.0 : 1.0,
+                opacity: widget.note == null ? 0.0 : 1.0,
                 duration: Duration(milliseconds: 1000),
-                child: noteItem))
+                child: NoteItem(
+                    note: widget.note, demoMode: true, onNotePreviewRequested: _previewNote)))
       ],
     ));
 
@@ -160,7 +162,6 @@ class _OnBoardingPageState extends State<OnBoardingPage>
           AnimatedOpacity(
             opacity: logoAnimationFinished ? 1.0 : 0.0,
             duration: Duration(seconds: 1),
-            onEnd: _onIntroContentFadedIn,
             child: Scaffold(
               appBar: null,
               backgroundColor: Settings.defaultColor,
@@ -195,12 +196,6 @@ class _OnBoardingPageState extends State<OnBoardingPage>
           IgnorePointer(
               ignoring: !modalVisible,
               child: AnimatedOpacity(
-                onEnd: () => {
-                  if (!modalVisible)
-                    {
-                      setState(() => {currentNoteRoute = null})
-                    }
-                },
                 opacity: modalVisible ? 1.0 : 0.0,
                 duration: Duration(milliseconds: 300),
                 child: Stack(
@@ -208,11 +203,11 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                     Container(
                       color: Color.fromARGB(100, 0, 0, 0),
                     ),
-                    if (currentNoteRoute != null)
+                    if (noteRoute != null)
                       ScaleTransition(
                         scale: _animationModal,
                         alignment: Alignment.center,
-                        child: currentNoteRoute,
+                        child: noteRoute,
                       )
                   ],
                 ),
@@ -231,11 +226,4 @@ class _OnBoardingPageState extends State<OnBoardingPage>
     setState(() {});
   }
 
-  void _onIntroContentFadedIn() {
-    IntroSamples.getSampleNote(context).then((value) => {
-          setState(() {
-            note = value;
-          })
-        });
-  }
 }

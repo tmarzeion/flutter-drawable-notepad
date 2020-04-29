@@ -4,7 +4,7 @@ import 'package:drawablenotepadflutter/routes/note/views/paint_picker.dart';
 import 'package:flutter/material.dart';
 
 class Constants {
-  static final showClearAlertSharedPrefKey = 'showClearAlert';
+  static final showTutorialSharedPrefKey = 'showTutorialSharedPrefKey';
 }
 
 class Settings {
