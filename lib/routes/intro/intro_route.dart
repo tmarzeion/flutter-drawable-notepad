@@ -45,7 +45,9 @@ class _OnBoardingPageState extends State<OnBoardingPage>
     _animationLogoPositionController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
     logoOffset = Tween<Offset>(begin: Offset.zero, end: Offset(0.0, -1.2))
-        .animate(_animationLogoPositionController);
+        .animate(_animationLogoPositionController.drive(
+      CurveTween(curve: Curves.easeInQuart),
+    ));
 
     _animationLogoScaleController = AnimationController(
         vsync: this,
@@ -161,7 +163,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
             child: AnimatedOpacity(
               opacity: animationFirstTextFinished ? 1.0 : 0.0,
               duration: Duration(milliseconds: arrowsAnimationDuration),
-              onEnd:() => {
+              onEnd: () => {
                 setState(() {
                   animationSecondArrowFinished = true;
                 })
