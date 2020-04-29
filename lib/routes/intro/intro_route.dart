@@ -44,7 +44,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
 
     _animationLogoPositionController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
-    logoOffset = Tween<Offset>(begin: Offset.zero, end: Offset(0.0, -1.1))
+    logoOffset = Tween<Offset>(begin: Offset.zero, end: Offset(0.0, -1.0))
         .animate(_animationLogoPositionController.drive(
       CurveTween(curve: Curves.easeInQuart),
     ));
@@ -52,7 +52,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
     _animationLogoScaleController = AnimationController(
         vsync: this,
         upperBound: 1.0,
-        lowerBound: 0.5,
+        lowerBound: 0.4,
         duration: Duration(milliseconds: 500));
     _animationLogoScale = CurvedAnimation(
         parent: _animationLogoScaleController, curve: Curves.easeInOutQuad);
