@@ -1,4 +1,4 @@
-# Drawable Notepad
+# Drawable Notepad 2
 [![Codemagic build status](https://api.codemagic.io/apps/5e9ea4ef23fafc18149bd52a/5e9ea4ef23fafc18149bd529/status_badge.svg)](https://codemagic.io/apps/5e9ea4ef23fafc18149bd52a/5e9ea4ef23fafc18149bd529/latest_build)
 
 
@@ -13,7 +13,7 @@ Features:
 - Saved setting of draw/text modes
 - Long press on note item -> Modal preview
 - Share feature
-- Supported languages: English, Polish, German, Russian, French, Japanese, Spanish
+- Supported languages: English, Polish, Danish, German, Russian, French, Japanese, Spanish
 
 TODO:
 - Search feature
