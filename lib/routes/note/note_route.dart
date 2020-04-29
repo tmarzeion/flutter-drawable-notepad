@@ -74,7 +74,7 @@ class _NoteRouteState extends State<NoteRoute>
             }));
 
     _keyboardAnimationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+        AnimationController(vsync: this, duration: Duration(milliseconds: 200));
 
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
@@ -115,10 +115,11 @@ class _NoteRouteState extends State<NoteRoute>
     double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     if (_animation == null) {
       if (keyboardHeight > 0) {
-        _animation = Tween(begin: 0.0, end: keyboardHeight).animate(_keyboardAnimationController)
-          ..addListener(() {
-            setState(() {});
-          });
+        _animation = Tween(begin: 0.0, end: keyboardHeight)
+            .animate(_keyboardAnimationController)
+              ..addListener(() {
+                setState(() {});
+              });
       }
     } else {
       if (keyboardHeight == 0 &&
@@ -188,7 +189,7 @@ class _NoteRouteState extends State<NoteRoute>
                       Opacity(opacity: 0, child: menuItems[1]),
                     IgnorePointer(
                       ignoring:
-                      shouldIgnoreTextEditorClicks || widget.previewMode,
+                          shouldIgnoreTextEditorClicks || widget.previewMode,
                       child: ZefyrScaffold(
                         child: ZefyrEditor(
                           scrollController: _scrollControllerForText,
@@ -202,7 +203,8 @@ class _NoteRouteState extends State<NoteRoute>
                     Padding(
                       padding: EdgeInsets.only(bottom: bottomPainterPadding),
                       child: IgnorePointer(
-                        ignoring: shouldIgnorePainterClicks || widget.previewMode,
+                        ignoring:
+                            shouldIgnorePainterClicks || widget.previewMode,
                         child: SingleChildScrollView(
                           physics: NeverScrollableScrollPhysics(),
                           controller: _scrollControllerForPainter,
@@ -217,7 +219,7 @@ class _NoteRouteState extends State<NoteRoute>
                     ),
                     Visibility(
                       visible:
-                      shouldIgnoreTextEditorClicks && !widget.previewMode,
+                          shouldIgnoreTextEditorClicks && !widget.previewMode,
                       child: Expanded(
                         child: Align(
                           alignment: AlignmentDirectional.bottomCenter,
@@ -225,7 +227,7 @@ class _NoteRouteState extends State<NoteRoute>
                               height: Settings.bottomBarHeight,
                               child: PaintPicker(_painterController,
                                   onUpdateNoteSettingsListener:
-                                  startSaveNoteTimer)),
+                                      startSaveNoteTimer)),
                         ),
                       ),
                     )
@@ -233,7 +235,7 @@ class _NoteRouteState extends State<NoteRoute>
                 ),
               ),
             ),
-            SizedBox(height: _animation?.value ?? 0)
+            Container(color: Colors.transparent, height: _animation?.value ?? 0)
           ],
         ),
       ),
@@ -245,7 +247,8 @@ class _NoteRouteState extends State<NoteRoute>
   void _scrollViews(DragUpdateDetails details) {
     final newPos = _scrollControllerForText.offset - details.delta.dy;
     if (newPos > 0) {
-      _scrollControllerForText.jumpTo(_scrollControllerForText.offset - details.delta.dy);
+      _scrollControllerForText
+          .jumpTo(_scrollControllerForText.offset - details.delta.dy);
     }
   }
 
