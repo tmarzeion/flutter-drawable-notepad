@@ -112,6 +112,7 @@ class NotesListState extends State<NotesList> with TickerProviderStateMixin {
                   return NoteItem(
                     key: ObjectKey(itemNote),
                     note: itemNote,
+                    demoMode: false,
                     onNotePreviewRequested: (note, show, share) => {
                       if (show)
                         {_showModal(note, share)}

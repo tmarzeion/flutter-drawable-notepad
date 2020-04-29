@@ -1,11 +1,8 @@
-import 'dart:typed_data';
-
 import 'package:drawablenotepadflutter/const.dart';
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:drawablenotepadflutter/routes/app_navigator.dart';
 import 'package:drawablenotepadflutter/translations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -14,10 +11,12 @@ import 'package:quiver/strings.dart';
 import 'package:zefyr/zefyr.dart';
 
 class NoteItem extends StatefulWidget {
-  NoteItem({Key key, this.note, this.onNotePreviewRequested}) : super(key: key);
+  NoteItem({Key key, this.note, this.onNotePreviewRequested, this.demoMode})
+      : super(key: key);
 
   final Note note;
   final Function onNotePreviewRequested;
+  final bool demoMode;
 
   @override
   State<StatefulWidget> createState() {
@@ -57,7 +56,7 @@ class NoteItemState extends State<NoteItem> {
             ),
           ),
           //icon: Icons.delete,
-          onTap: () => database.deleteNote(widget.note),
+          onTap: () => _deleteNote(database),
         ),
         IconSlideAction(
           color: Settings.swipeShareBackgroundColor,
@@ -79,11 +78,15 @@ class NoteItemState extends State<NoteItem> {
         )
       ],
       child: GestureDetector(
-        onLongPress: () => {widget.onNotePreviewRequested(widget.note, true, false)},
+        onLongPress: () =>
+            {widget.onNotePreviewRequested(widget.note, true, false)},
         onLongPressEnd: (d) =>
             widget.onNotePreviewRequested(widget.note, false, false),
         child: InkWell(
-            onTap: () => AppNavigator.navigateToNoteEdit(context, note),
+            onTap: () => {
+                  if (!widget.demoMode)
+                    {AppNavigator.navigateToNoteEdit(context, note)}
+                },
             child: Padding(
               padding: const EdgeInsets.only(
                   top: 8.0, bottom: 8.0, left: 16.0, right: 16.0),
@@ -150,10 +153,12 @@ class NoteItemState extends State<NoteItem> {
   // Nullable
   String _getSecondLineOfText(String noteText) {
     if (_getNotBlankLine(noteText, 0) == null) {
-      return AppLocalizations.of(context).translate('noteItemHandwrittenNoteTitle');
+      return AppLocalizations.of(context)
+          .translate('noteItemHandwrittenNoteTitle');
     } else {
       return _getNotBlankLine(noteText, 1) ??
-          AppLocalizations.of(context).translate('noteItemDefaultAlternativeTitle');
+          AppLocalizations.of(context)
+              .translate('noteItemDefaultAlternativeTitle');
     }
   }
 
@@ -172,7 +177,8 @@ class NoteItemState extends State<NoteItem> {
 
       case 1:
         {
-          return AppLocalizations.of(context).translate('noteItemYesterdayText');
+          return AppLocalizations.of(context)
+              .translate('noteItemYesterdayText');
         }
         break;
 
@@ -198,6 +204,14 @@ class NoteItemState extends State<NoteItem> {
   }
 
   Future<void> _shareNote() {
-    widget.onNotePreviewRequested(widget.note, true, true);
+    if (!widget.demoMode) {
+      widget.onNotePreviewRequested(widget.note, true, true);
+    }
+  }
+
+  void _deleteNote(NotepadDatabase database) {
+    if (!widget.demoMode) {
+      database.deleteNote(widget.note);
+    }
   }
 }

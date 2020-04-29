@@ -36,7 +36,7 @@ dependencies:
   flutter_colorpicker: ^0.3.2
   json_serializable: ^3.3.0
   esys_flutter_share: ^1.0.2
-  introduction_screen: ^1.0.7
+  page_transition: ^1.1.5
   zefyr:
     git:
       url: git://github.com/tmarzeion/zefyr.git
@@ -56,7 +56,13 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   moor_generator: ^2.1.1
+  flutter_launcher_icons: ^0.7.3
   build_runner:
+
+flutter_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
