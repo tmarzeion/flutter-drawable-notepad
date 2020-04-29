@@ -16,11 +16,9 @@ Features:
 - Supported languages: English, Polish, German, Russian, French, Japanese, Spanish
 
 TODO:
-- Drawing history optimization (don't redraw whole history with every ui update)
 - Search feature
 - Tests + CI
 - Architecture refactor (DI, State management, clean arch)
 
 BUGS:
-- First try of modal animation have bad performance.
 - Remove scroll on note, make max lines for text edit
