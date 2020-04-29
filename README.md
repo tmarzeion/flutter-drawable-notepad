@@ -20,6 +20,3 @@ TODO:
 - Search feature
 - Tests + CI
 - Architecture refactor (DI, State management, clean arch)
-
-BUGS:
-- Remove scroll on note, make max lines for text edit
