@@ -35,15 +35,15 @@ class DrawModeController {
     fontPickerKey.currentState.isOpen = visible;
     onToolbarStateChanged?.call();
     if (visible) {
-      _hidePaintPicker();
+      hidePaintPicker();
     }
   }
 
-  _hideFontPicker() {
+  hideFontPicker() {
     fontPickerKey.currentState.close();
   }
 
-  _hidePaintPicker() {
+  hidePaintPicker() {
     paintPickerKey.currentState.close();
   }
 
@@ -57,12 +57,12 @@ class DrawModeController {
 
   toggleFontPicker() {
     _toggleCloseable(fontPickerKey.currentState);
-    _hidePaintPicker();
+    hidePaintPicker();
   }
 
   togglePaintPicker() {
     _toggleCloseable(paintPickerKey.currentState);
-    _hideFontPicker();
+    hideFontPicker();
     onToolbarStateChanged?.call();
   }
 

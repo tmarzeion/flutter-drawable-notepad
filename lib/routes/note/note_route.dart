@@ -27,11 +27,17 @@ class NoteRoute extends StatefulWidget {
   _NoteRouteState createState() => _NoteRouteState();
 }
 
-class _NoteRouteState extends State<NoteRoute> {
+class _NoteRouteState extends State<NoteRoute>
+    with SingleTickerProviderStateMixin {
   // Controllers
   ZefyrController _zefyrController;
   PainterController _painterController;
   DrawModeController _drawModeController;
+  ScrollController _scrollControllerForText = new ScrollController();
+  ScrollController _scrollControllerForPainter = new ScrollController();
+
+  AnimationController _keyboardAnimationController;
+  Animation _animation;
 
   // For zefyr
   FocusNode _focusNode;
@@ -66,6 +72,21 @@ class _NoteRouteState extends State<NoteRoute> {
         onToolbarStateChanged: () => setState(() {
               startSaveNoteTimer();
             }));
+
+    _keyboardAnimationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        _keyboardAnimationController.forward();
+      } else {
+        _keyboardAnimationController.reverse();
+      }
+    });
+
+    _scrollControllerForText.addListener(() {
+      _scrollControllerForPainter.jumpTo(_scrollControllerForText.offset);
+    });
   }
 
   // TODO: Provide it via DI
@@ -91,6 +112,22 @@ class _NoteRouteState extends State<NoteRoute> {
 
   @override
   Widget build(BuildContext context) {
+    double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    if (_animation == null) {
+      if (keyboardHeight > 0) {
+        _animation = Tween(begin: 0.0, end: keyboardHeight).animate(_keyboardAnimationController)
+          ..addListener(() {
+            setState(() {});
+          });
+      }
+    } else {
+      if (keyboardHeight == 0 &&
+          _animation.value > 0 &&
+          _animation.isCompleted) {
+        _drawModeController.hideFontPicker();
+      }
+    }
+
     // Note that the editor requires special `ZefyrScaffold` widget to be
     // one of its parents.
     bool shouldIgnoreTextEditorClicks = _drawModeController.isDrawMode();
@@ -129,6 +166,7 @@ class _NoteRouteState extends State<NoteRoute> {
     final view = WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
+        resizeToAvoidBottomPadding: false, // this avoids the overflow error
         appBar: widget.previewMode
             ? null
             : AppBar(
@@ -136,50 +174,79 @@ class _NoteRouteState extends State<NoteRoute> {
                     .translate('noteRouteToolbarTitle')),
                 actions: menuItems,
               ),
-        body: Stack(
-          children: [
-            // Ugly hack to prevent keyboard from showing on preview mode«
-            if (widget.previewMode)
-              Opacity(opacity: 0, child: menuItems[0]),
-            if (widget.previewMode)
-              Opacity(opacity: 0, child: menuItems[1]),
-            IgnorePointer(
-              ignoring: shouldIgnoreTextEditorClicks || widget.previewMode,
-              child: ZefyrScaffold(
-                child: ZefyrEditor(
-                  padding: EdgeInsets.all(16),
-                  physics: NeverScrollableScrollPhysics(),
-                  controller: _zefyrController,
-                  focusNode: _focusNode,
+        body: Column(
+          children: <Widget>[
+            Expanded(
+              child: GestureDetector(
+                onPanUpdate: _scrollViews,
+                child: Stack(
+                  children: [
+                    // Ugly hack to prevent keyboard from showing on preview mode«
+                    if (widget.previewMode)
+                      Opacity(opacity: 0, child: menuItems[0]),
+                    if (widget.previewMode)
+                      Opacity(opacity: 0, child: menuItems[1]),
+                    IgnorePointer(
+                      ignoring:
+                      shouldIgnoreTextEditorClicks || widget.previewMode,
+                      child: ZefyrScaffold(
+                        child: ZefyrEditor(
+                          scrollController: _scrollControllerForText,
+                          physics: NeverScrollableScrollPhysics(),
+                          padding: EdgeInsets.all(16),
+                          controller: _zefyrController,
+                          focusNode: _focusNode,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: bottomPainterPadding),
+                      child: IgnorePointer(
+                        ignoring: shouldIgnorePainterClicks || widget.previewMode,
+                        child: SingleChildScrollView(
+                          physics: NeverScrollableScrollPhysics(),
+                          controller: _scrollControllerForPainter,
+                          child: Container(
+                            height: 1920,
+                            child: Opacity(
+                                opacity: 0.6,
+                                child: Painter(_painterController)),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible:
+                      shouldIgnoreTextEditorClicks && !widget.previewMode,
+                      child: Expanded(
+                        child: Align(
+                          alignment: AlignmentDirectional.bottomCenter,
+                          child: Container(
+                              height: Settings.bottomBarHeight,
+                              child: PaintPicker(_painterController,
+                                  onUpdateNoteSettingsListener:
+                                  startSaveNoteTimer)),
+                        ),
+                      ),
+                    )
+                  ],
                 ),
               ),
             ),
-            IgnorePointer(
-              ignoring: shouldIgnorePainterClicks || widget.previewMode,
-              child: Padding(
-                padding: EdgeInsets.only(bottom: bottomPainterPadding),
-                child:
-                    Opacity(opacity: 0.6, child: Painter(_painterController)),
-              ),
-            ),
-            Visibility(
-              visible: shouldIgnoreTextEditorClicks && !widget.previewMode,
-              child: Expanded(
-                child: Align(
-                  alignment: AlignmentDirectional.bottomCenter,
-                  child: Container(
-                      height: Settings.bottomBarHeight,
-                      child: PaintPicker(_painterController,
-                          onUpdateNoteSettingsListener: startSaveNoteTimer)),
-                ),
-              ),
-            )
+            SizedBox(height: _animation?.value ?? 0)
           ],
         ),
       ),
     );
     initialized = true;
     return view;
+  }
+
+  void _scrollViews(DragUpdateDetails details) {
+    final newPos = _scrollControllerForText.offset - details.delta.dy;
+    if (newPos > 0) {
+      _scrollControllerForText.jumpTo(_scrollControllerForText.offset - details.delta.dy);
+    }
   }
 
   Future<bool> _onWillPop() async {
