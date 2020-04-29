@@ -148,6 +148,7 @@ class _NoteRouteState extends State<NoteRoute> {
               child: ZefyrScaffold(
                 child: ZefyrEditor(
                   padding: EdgeInsets.all(16),
+                  physics: NeverScrollableScrollPhysics(),
                   controller: _zefyrController,
                   focusNode: _focusNode,
                 ),
