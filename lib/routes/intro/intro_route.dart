@@ -7,19 +7,16 @@ import 'package:flutter/material.dart';
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
 
 class OnBoardingPage extends StatefulWidget {
-
   OnBoardingPage({this.note});
 
   Note note;
 
   @override
   _OnBoardingPageState createState() => _OnBoardingPageState();
-
 }
 
 class _OnBoardingPageState extends State<OnBoardingPage>
     with TickerProviderStateMixin {
-
   var noteRoute;
   CurvedAnimation _animationModal;
   CurvedAnimation _animationLogoScale;
@@ -28,11 +25,13 @@ class _OnBoardingPageState extends State<OnBoardingPage>
   AnimationController _animationLogoScaleController;
   bool modalVisible = false;
   bool logoAnimationFinished = false;
+  bool animationFirstArrowFinished = false;
+  bool animationFirstTextFinished = false;
+  bool animationSecondArrowFinished = false;
   Animation<Offset> logoOffset;
 
   @override
   void initState() {
-
     noteRoute = NoteRoute(note: widget.note, previewMode: true);
 
     _animationModalController = AnimationController(
@@ -70,16 +69,29 @@ class _OnBoardingPageState extends State<OnBoardingPage>
   Widget build(BuildContext context) {
     List<Widget> notesItems = List();
 
+    final int textAnimationDuration = 400;
+    final int arrowsAnimationDuration = 200;
+
     notesItems.add(Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Transform.rotate(
-        angle: -0.1,
-        child: Text(
-          AppLocalizations.of(context).translate('tutorialLongPressForPreview'),
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+      child: AnimatedOpacity(
+        opacity: animationFirstArrowFinished ? 1.0 : 0.0,
+        duration: Duration(milliseconds: textAnimationDuration),
+        onEnd: () => {
+          setState(() {
+            animationFirstTextFinished = true;
+          })
+        },
+        child: Transform.rotate(
+          angle: -0.1,
+          child: Text(
+            AppLocalizations.of(context)
+                .translate('tutorialLongPressForPreview'),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),
@@ -87,34 +99,35 @@ class _OnBoardingPageState extends State<OnBoardingPage>
 
     notesItems.add(Padding(
       padding: const EdgeInsets.all(24.0),
-      child: Transform(
-        transform: Matrix4.rotationY(3.14),
-        alignment: Alignment.center,
-        child: Transform.rotate(
-          angle: 1.0,
-          child: Image(
-            image: AssetImage("assets/arrow.png"),
-            width: 100,
-            height: 100,
+      child: AnimatedOpacity(
+        opacity: logoAnimationFinished ? 1.0 : 0.0,
+        duration: Duration(milliseconds: arrowsAnimationDuration),
+        onEnd: () => {
+          setState(() {
+            animationFirstArrowFinished = true;
+          })
+        },
+        child: Transform(
+          transform: Matrix4.rotationY(3.14),
+          alignment: Alignment.center,
+          child: Transform.rotate(
+            angle: 1.0,
+            child: Image(
+              image: AssetImage("assets/arrow.png"),
+              width: 100,
+              height: 100,
+            ),
           ),
         ),
       ),
     ));
-    
-    notesItems.add(Stack(
-      children: <Widget>[
-        Container(
-          height: 55,
-          color: Colors.white,
-        ),
-        Container(
-            child: AnimatedOpacity(
-                opacity: widget.note == null ? 0.0 : 1.0,
-                duration: Duration(milliseconds: 1000),
-                child: NoteItem(
-                    note: widget.note, demoMode: true, onNotePreviewRequested: _previewNote)))
-      ],
-    ));
+
+    notesItems.add(Container(
+        color: Colors.white,
+        child: NoteItem(
+            note: widget.note,
+            demoMode: true,
+            onNotePreviewRequested: _previewNote)));
 
     notesItems.add(Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,15 +137,19 @@ class _OnBoardingPageState extends State<OnBoardingPage>
         Container(
           padding: EdgeInsets.only(right: 24.0, top: 24),
           width: 200,
-          child: Transform.rotate(
-            angle: 0.1,
-            child: Text(
-              AppLocalizations.of(context)
-                  .translate('tutorialSwipeToShareDelete'),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+          child: AnimatedOpacity(
+            opacity: animationSecondArrowFinished ? 1.0 : 0.0,
+            duration: Duration(milliseconds: textAnimationDuration),
+            child: Transform.rotate(
+              angle: 0.1,
+              child: Text(
+                AppLocalizations.of(context)
+                    .translate('tutorialSwipeToShareDelete'),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -141,12 +158,21 @@ class _OnBoardingPageState extends State<OnBoardingPage>
           alignment: Alignment.topRight,
           child: Padding(
             padding: const EdgeInsets.only(right: 32.0),
-            child: Transform.rotate(
-              angle: -1.3,
-              child: Image(
-                image: AssetImage("assets/arrow.png"),
-                width: 100,
-                height: 100,
+            child: AnimatedOpacity(
+              opacity: animationFirstTextFinished ? 1.0 : 0.0,
+              duration: Duration(milliseconds: arrowsAnimationDuration),
+              onEnd:() => {
+                setState(() {
+                  animationSecondArrowFinished = true;
+                })
+              },
+              child: Transform.rotate(
+                angle: -1.3,
+                child: Image(
+                  image: AssetImage("assets/arrow.png"),
+                  width: 100,
+                  height: 100,
+                ),
               ),
             ),
           ),
@@ -225,5 +251,4 @@ class _OnBoardingPageState extends State<OnBoardingPage>
     }
     setState(() {});
   }
-
 }
