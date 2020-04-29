@@ -74,6 +74,7 @@ flutter:
     - i18n/en.json
     - i18n/pl.json
     - i18n/de.json
+    - i18n/da.json
     - i18n/es.json
     - i18n/fr.json
     - i18n/ja.json
