@@ -14,6 +14,7 @@ Features:
 - Long press on note item -> Modal preview
 - Share feature
 - Supported languages: English, Polish, Danish, German, Russian, French, Japanese, Spanish
+- Interactive intro screen
 
 TODO:
 - Search feature
