@@ -20,7 +20,7 @@ class AppNavigator {
 
   static void navigateToNoteList(BuildContext context) {
     Navigator.of(context).pushAndRemoveUntil(
-      PageTransition(type: PageTransitionType.fade, child: ListRoute()),
+      PageTransition(type: PageTransitionType.fade, duration: Duration(milliseconds: 1000), child: ListRoute()),
       (Route<dynamic> route) => false,
     );
   }

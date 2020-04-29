@@ -5,6 +5,7 @@ import 'package:drawablenotepadflutter/routes/note/note_route.dart';
 import 'package:drawablenotepadflutter/translations.dart';
 import 'package:flutter/material.dart';
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnBoardingPage extends StatefulWidget {
   OnBoardingPage({this.note});
@@ -197,7 +198,10 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                 backgroundColor: Settings.defaultColor[100],
                 child: new Icon(Icons.arrow_forward, size: 30.0),
                 heroTag: null,
-                onPressed: () => {AppNavigator.navigateToNoteList(context)},
+                onPressed: () => {
+                  _setTutorialDone(),
+                  AppNavigator.navigateToNoteList(context)
+                },
               ),
               body: Container(
                   child: Padding(
@@ -243,6 +247,11 @@ class _OnBoardingPageState extends State<OnBoardingPage>
         ],
       ),
     );
+  }
+
+  _setTutorialDone() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(Constants.showTutorialSharedPrefKey, true);
   }
 
   void _previewNote(Note note, bool show, bool share) {

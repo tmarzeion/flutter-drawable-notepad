@@ -127,7 +127,7 @@ class NotesListState extends State<NotesList> with TickerProviderStateMixin {
                     ),
                 itemCount: notes.length),
             AnimatedOpacity(
-              opacity: notes.length == 0 ? 1.0 : 0.0,
+              opacity: snapshot.data == null || notes.length > 0 ? 0.0 : 1.0,
               duration: Duration(milliseconds: 200),
               child: Align(
                   alignment: Alignment.bottomRight,
