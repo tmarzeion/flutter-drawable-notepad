@@ -20,3 +20,10 @@ TODO:
 - Search feature
 - Tests + CI
 - Architecture refactor (DI, State management, clean arch)
+
+Bugs:
+
+Some widgets shouldn't appear:
+1. Search query for no results
+2. Cancel search mode
+3. See if there are blinking widgets
