@@ -17,6 +17,7 @@ class _ListRouteState extends State<ListRoute> {
   bool searchExpanded = false;
   NotesList notesList;
   TextEditingController _searchTextController;
+  FocusNode _focusNode = FocusNode();
 
   final _notesListStateKey = GlobalKey<NotesListState>();
 
@@ -28,55 +29,63 @@ class _ListRouteState extends State<ListRoute> {
 
   @override
   Widget build(BuildContext context) {
-    Widget searchWidget;
+    Widget searchWidget = Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        AnimatedOpacity(
+          duration: Duration(milliseconds: 500),
+          curve: Curves.fastOutSlowIn,
+          opacity: searchExpanded ? 1.0 : 0.0,
+          child: IconButton(
+            padding: EdgeInsets.all(0.0),
+            icon: (Icon(Icons.close, size: 24)),
+            onPressed: _toggleSearch,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+          child: AnimatedContainer(
+              duration: Duration(milliseconds: 500),
+              curve: Curves.fastOutSlowIn,
+              height: 50,
+              width:
+                  searchExpanded ? MediaQuery.of(context).size.width - 48 : 0.0,
+              decoration: new BoxDecoration(
+                  color: Colors.black.withAlpha(50),
+                  borderRadius: new BorderRadius.circular(40.0)),
+              child: TextField(
+                controller: _searchTextController,
+                focusNode: _focusNode,
+                decoration: InputDecoration(
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    contentPadding:
+                        EdgeInsets.only(left: 15, bottom: 7, top: 0, right: 15),
+                    hintText: AppLocalizations.of(context)
+                        .translate('searchBarTypeToSearch')),
+                onChanged: _onSearchQueryChanged,
+              )),
+        ),
+      ],
+    );
 
-    if (searchExpanded) {
-      searchWidget = Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
+    Widget searchIcon = AnimatedOpacity(
+        duration: Duration(milliseconds: 500),
+        curve: Curves.fastOutSlowIn,
+        opacity: !searchExpanded ? 1.0 : 0.0,
+        child: Align(
+            alignment: Alignment.centerRight,
             child: IconButton(
               padding: EdgeInsets.all(0.0),
-              icon: (Icon(Icons.arrow_back, size: 24)),
-              onPressed: _toggleSearch,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-                height: 50,
-                width: MediaQuery.of(context).size.width - 72,
-                decoration: new BoxDecoration(
-                    color: Colors.black.withAlpha(50),
-                    borderRadius: new BorderRadius.circular(40.0)),
-                child: TextField(
-                  controller: _searchTextController,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                      border: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      errorBorder: InputBorder.none,
-                      disabledBorder: InputBorder.none,
-                      contentPadding: EdgeInsets.only(
-                          left: 15, bottom: 7, top: 0, right: 15),
-                      hintText: AppLocalizations.of(context)
-                          .translate('searchBarTypeToSearch')),
-                  onChanged: _onSearchQueryChanged,
-                )),
-          ),
-        ],
-      );
-    } else {
-      searchWidget = IconButton(
-        icon: Icon(Icons.search),
-        onPressed: () {
-          _toggleSearch();
-        },
-      );
-    }
+              icon: Icon(Icons.search),
+              onPressed: () {
+                _toggleSearch();
+              },
+            )));
 
     notesList = NotesList(
       key: _notesListStateKey,
@@ -86,7 +95,9 @@ class _ListRouteState extends State<ListRoute> {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)
             .translate('notesListRouteToolbarTitle')),
-        actions: <Widget>[searchWidget],
+        actions: <Widget>[
+          Stack(children: <Widget>[searchWidget, searchIcon])
+        ],
       ),
       body: notesList,
       floatingActionButton: FloatingActionButton(
@@ -102,6 +113,11 @@ class _ListRouteState extends State<ListRoute> {
       searchExpanded = !searchExpanded;
       _searchTextController.text = "";
       _onSearchQueryChanged("");
+      if (searchExpanded) {
+        _focusNode.requestFocus();
+      } else {
+        FocusScope.of(context).requestFocus(new FocusNode());
+      }
     });
   }
 

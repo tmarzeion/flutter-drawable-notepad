@@ -14,14 +14,12 @@ import 'dart:ui' as ui;
 import '../../../const.dart';
 
 class NotesList extends StatefulWidget {
-
   NotesList({Key key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
     return new NotesListState();
   }
-
 }
 
 class NotesListState extends State<NotesList> with TickerProviderStateMixin {
@@ -115,6 +113,26 @@ class NotesListState extends State<NotesList> with TickerProviderStateMixin {
 
         return Stack(
           children: [
+            AnimatedOpacity(
+              duration: Duration(milliseconds: 300),
+              opacity: searchQuery.isNotEmpty &&
+                      notes.length == 0 &&
+                      snapshot.data != null
+                  ? 1.0
+                  : 0.0,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: Text(
+                    AppLocalizations.of(context)
+                        .translate('searchBarNotFound')
+                        .replaceAll("%s", searchQuery),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+              ),
+            ),
             ListView.separated(
                 itemBuilder: (_, index) {
                   final itemNote = notes[snapshot.data.length -
@@ -138,7 +156,11 @@ class NotesListState extends State<NotesList> with TickerProviderStateMixin {
                     ),
                 itemCount: notes.length),
             AnimatedOpacity(
-              opacity: (snapshot.data == null || notes.isNotEmpty || searchQuery.isNotEmpty) ? 0.0 : 1.0,
+              opacity: (snapshot.data == null ||
+                      notes.isNotEmpty ||
+                      searchQuery.isNotEmpty)
+                  ? 0.0
+                  : 1.0,
               duration: Duration(milliseconds: 200),
               child: Align(
                   alignment: Alignment.bottomRight,
