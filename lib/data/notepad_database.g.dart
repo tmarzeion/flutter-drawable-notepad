@@ -11,12 +11,14 @@ class Note extends DataClass implements Insertable<Note> {
   final int id;
   final String paths;
   final String noteText;
+  final String notePlainText;
   final DateTime noteDate;
   final String noteSettings;
   Note(
       {@required this.id,
       this.paths,
       @required this.noteText,
+      @required this.notePlainText,
       @required this.noteDate,
       @required this.noteSettings});
   factory Note.fromData(Map<String, dynamic> data, GeneratedDatabase db,
@@ -31,6 +33,8 @@ class Note extends DataClass implements Insertable<Note> {
           stringType.mapFromDatabaseResponse(data['${effectivePrefix}paths']),
       noteText: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}note_text']),
+      notePlainText: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}note_plain_text']),
       noteDate: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}note_date']),
       noteSettings: stringType
@@ -44,6 +48,7 @@ class Note extends DataClass implements Insertable<Note> {
       id: serializer.fromJson<int>(json['id']),
       paths: serializer.fromJson<String>(json['paths']),
       noteText: serializer.fromJson<String>(json['noteText']),
+      notePlainText: serializer.fromJson<String>(json['notePlainText']),
       noteDate: serializer.fromJson<DateTime>(json['noteDate']),
       noteSettings: serializer.fromJson<String>(json['noteSettings']),
     );
@@ -55,6 +60,7 @@ class Note extends DataClass implements Insertable<Note> {
       'id': serializer.toJson<int>(id),
       'paths': serializer.toJson<String>(paths),
       'noteText': serializer.toJson<String>(noteText),
+      'notePlainText': serializer.toJson<String>(notePlainText),
       'noteDate': serializer.toJson<DateTime>(noteDate),
       'noteSettings': serializer.toJson<String>(noteSettings),
     };
@@ -69,6 +75,9 @@ class Note extends DataClass implements Insertable<Note> {
       noteText: noteText == null && nullToAbsent
           ? const Value.absent()
           : Value(noteText),
+      notePlainText: notePlainText == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notePlainText),
       noteDate: noteDate == null && nullToAbsent
           ? const Value.absent()
           : Value(noteDate),
@@ -82,12 +91,14 @@ class Note extends DataClass implements Insertable<Note> {
           {int id,
           String paths,
           String noteText,
+          String notePlainText,
           DateTime noteDate,
           String noteSettings}) =>
       Note(
         id: id ?? this.id,
         paths: paths ?? this.paths,
         noteText: noteText ?? this.noteText,
+        notePlainText: notePlainText ?? this.notePlainText,
         noteDate: noteDate ?? this.noteDate,
         noteSettings: noteSettings ?? this.noteSettings,
       );
@@ -97,6 +108,7 @@ class Note extends DataClass implements Insertable<Note> {
           ..write('id: $id, ')
           ..write('paths: $paths, ')
           ..write('noteText: $noteText, ')
+          ..write('notePlainText: $notePlainText, ')
           ..write('noteDate: $noteDate, ')
           ..write('noteSettings: $noteSettings')
           ..write(')'))
@@ -108,8 +120,10 @@ class Note extends DataClass implements Insertable<Note> {
       id.hashCode,
       $mrjc(
           paths.hashCode,
-          $mrjc(noteText.hashCode,
-              $mrjc(noteDate.hashCode, noteSettings.hashCode)))));
+          $mrjc(
+              noteText.hashCode,
+              $mrjc(notePlainText.hashCode,
+                  $mrjc(noteDate.hashCode, noteSettings.hashCode))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
@@ -117,6 +131,7 @@ class Note extends DataClass implements Insertable<Note> {
           other.id == this.id &&
           other.paths == this.paths &&
           other.noteText == this.noteText &&
+          other.notePlainText == this.notePlainText &&
           other.noteDate == this.noteDate &&
           other.noteSettings == this.noteSettings);
 }
@@ -125,12 +140,14 @@ class NotesCompanion extends UpdateCompanion<Note> {
   final Value<int> id;
   final Value<String> paths;
   final Value<String> noteText;
+  final Value<String> notePlainText;
   final Value<DateTime> noteDate;
   final Value<String> noteSettings;
   const NotesCompanion({
     this.id = const Value.absent(),
     this.paths = const Value.absent(),
     this.noteText = const Value.absent(),
+    this.notePlainText = const Value.absent(),
     this.noteDate = const Value.absent(),
     this.noteSettings = const Value.absent(),
   });
@@ -138,21 +155,25 @@ class NotesCompanion extends UpdateCompanion<Note> {
     this.id = const Value.absent(),
     this.paths = const Value.absent(),
     @required String noteText,
+    @required String notePlainText,
     @required DateTime noteDate,
     @required String noteSettings,
   })  : noteText = Value(noteText),
+        notePlainText = Value(notePlainText),
         noteDate = Value(noteDate),
         noteSettings = Value(noteSettings);
   NotesCompanion copyWith(
       {Value<int> id,
       Value<String> paths,
       Value<String> noteText,
+      Value<String> notePlainText,
       Value<DateTime> noteDate,
       Value<String> noteSettings}) {
     return NotesCompanion(
       id: id ?? this.id,
       paths: paths ?? this.paths,
       noteText: noteText ?? this.noteText,
+      notePlainText: notePlainText ?? this.notePlainText,
       noteDate: noteDate ?? this.noteDate,
       noteSettings: noteSettings ?? this.noteSettings,
     );
@@ -189,8 +210,25 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
   @override
   GeneratedTextColumn get noteText => _noteText ??= _constructNoteText();
   GeneratedTextColumn _constructNoteText() {
-    return GeneratedTextColumn('note_text', $tableName, false,
-        minTextLength: 1, maxTextLength: 16384);
+    return GeneratedTextColumn(
+      'note_text',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _notePlainTextMeta =
+      const VerificationMeta('notePlainText');
+  GeneratedTextColumn _notePlainText;
+  @override
+  GeneratedTextColumn get notePlainText =>
+      _notePlainText ??= _constructNotePlainText();
+  GeneratedTextColumn _constructNotePlainText() {
+    return GeneratedTextColumn(
+      'note_plain_text',
+      $tableName,
+      false,
+    );
   }
 
   final VerificationMeta _noteDateMeta = const VerificationMeta('noteDate');
@@ -221,7 +259,7 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
 
   @override
   List<GeneratedColumn> get $columns =>
-      [id, paths, noteText, noteDate, noteSettings];
+      [id, paths, noteText, notePlainText, noteDate, noteSettings];
   @override
   $NotesTable get asDslTable => this;
   @override
@@ -244,6 +282,14 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
           noteText.isAcceptableValue(d.noteText.value, _noteTextMeta));
     } else if (isInserting) {
       context.missing(_noteTextMeta);
+    }
+    if (d.notePlainText.present) {
+      context.handle(
+          _notePlainTextMeta,
+          notePlainText.isAcceptableValue(
+              d.notePlainText.value, _notePlainTextMeta));
+    } else if (isInserting) {
+      context.missing(_notePlainTextMeta);
     }
     if (d.noteDate.present) {
       context.handle(_noteDateMeta,
@@ -281,6 +327,10 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
     }
     if (d.noteText.present) {
       map['note_text'] = Variable<String, StringType>(d.noteText.value);
+    }
+    if (d.notePlainText.present) {
+      map['note_plain_text'] =
+          Variable<String, StringType>(d.notePlainText.value);
     }
     if (d.noteDate.present) {
       map['note_date'] = Variable<DateTime, DateTimeType>(d.noteDate.value);

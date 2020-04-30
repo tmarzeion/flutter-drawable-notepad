@@ -14,10 +14,14 @@ import 'dart:ui' as ui;
 import '../../../const.dart';
 
 class NotesList extends StatefulWidget {
+
+  NotesList({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return new NotesListState();
   }
+
 }
 
 class NotesListState extends State<NotesList> with TickerProviderStateMixin {
@@ -25,12 +29,19 @@ class NotesListState extends State<NotesList> with TickerProviderStateMixin {
   bool shareMode = false;
   bool screenShootEffectVisibile = false;
   Note visibleNote;
+  String searchQuery = "";
 
   var currentNoteRoute;
   AnimationController _animationController;
   CurvedAnimation _animation;
 
   GlobalKey _repaintKey = new GlobalKey();
+
+  void onQueryTextChanged(String query) {
+    setState(() {
+      searchQuery = query;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +109,7 @@ class NotesListState extends State<NotesList> with TickerProviderStateMixin {
   StreamBuilder<List<Note>> _buildNotesList() {
     final database = Provider.of<NotepadDatabase>(context);
     return StreamBuilder(
-      stream: database.watchAllNotes(),
+      stream: database.watchEntriesWithText(searchQuery),
       builder: (context, AsyncSnapshot snapshot) {
         final notes = snapshot.data ?? List();
 
@@ -127,7 +138,7 @@ class NotesListState extends State<NotesList> with TickerProviderStateMixin {
                     ),
                 itemCount: notes.length),
             AnimatedOpacity(
-              opacity: snapshot.data == null || notes.length > 0 ? 0.0 : 1.0,
+              opacity: (snapshot.data == null || notes.isNotEmpty || searchQuery.isNotEmpty) ? 0.0 : 1.0,
               duration: Duration(milliseconds: 200),
               child: Align(
                   alignment: Alignment.bottomRight,

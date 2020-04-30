@@ -39,6 +39,8 @@ class _NoteRouteState extends State<NoteRoute>
   AnimationController _keyboardAnimationController;
   Animation _animation;
 
+  NotepadDatabase database;
+
   // For zefyr
   FocusNode _focusNode;
 
@@ -53,6 +55,8 @@ class _NoteRouteState extends State<NoteRoute>
   @override
   void initState() {
     super.initState();
+
+    database = Provider.of<NotepadDatabase>(context, listen: false);
 
     // Init zefyr
     final document = _loadDocument();
@@ -265,8 +269,6 @@ class _NoteRouteState extends State<NoteRoute>
   }
 
   Future<bool> _saveNote({isPopping = false}) async {
-    /// Loads the document to be edited in Zefyr.
-    final database = Provider.of<NotepadDatabase>(context, listen: false);
 
     String paintHistory = _painterController.history;
     String noteSettings = _getCurrentNoteSettings();
@@ -280,6 +282,7 @@ class _NoteRouteState extends State<NoteRoute>
             widget.note.noteSettings != noteSettings) {
           var newNote = widget.note.copyWith(
               noteText: noteText,
+              notePlainText: _zefyrController.document.toPlainText(),
               paths: paintHistory == null ? "[]" : paintHistory,
               noteSettings: _getCurrentNoteSettings());
           database.updateNote(newNote);
@@ -288,6 +291,7 @@ class _NoteRouteState extends State<NoteRoute>
       } else {
         var newNote = Note(
             noteText: noteText,
+            notePlainText: _zefyrController.document.toPlainText(),
             noteDate: new DateTime.now(),
             noteSettings: _getCurrentNoteSettings(),
             paths: paintHistory);
