@@ -85,7 +85,11 @@ class NoteItemState extends State<NoteItem> {
         child: InkWell(
             onTap: () => {
                   if (!widget.demoMode)
-                    {AppNavigator.navigateToNoteEdit(context, note)}
+                    {
+                      database.getDrawing(note.drawingId).then((drawing) => {
+                        AppNavigator.navigateToNoteEdit(context, note, drawing)
+                      })
+                    }
                 },
             child: Padding(
               padding: const EdgeInsets.only(

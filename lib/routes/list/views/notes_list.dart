@@ -226,10 +226,22 @@ class NotesListState extends State<NotesList> with TickerProviderStateMixin {
   }
 
   _showModal(Note note, bool share) {
+    final database = Provider.of<NotepadDatabase>(context, listen: false);
+    if (note.drawingId == null) {
+      _setStateToModal(share, note, null);
+    } else {
+      database.getDrawing(note.drawingId).then((drawing) => {
+        _setStateToModal(share, note, drawing)
+      });
+    }
+  }
+
+  _setStateToModal(bool share, Note note, Drawing drawing) {
     setState(() {
       refreshAnimation();
       shareMode = share;
-      currentNoteRoute = NoteRoute(note: note, previewMode: true);
+      currentNoteRoute =
+          NoteRoute(note: note, drawing: drawing, previewMode: true);
       modalVisible = true;
       _animationController.forward();
     });

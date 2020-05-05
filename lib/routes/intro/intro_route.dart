@@ -8,9 +8,10 @@ import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OnBoardingPage extends StatefulWidget {
-  OnBoardingPage({this.note});
+  OnBoardingPage({this.note, this.drawing});
 
   Note note;
+  Drawing drawing;
 
   @override
   _OnBoardingPageState createState() => _OnBoardingPageState();
@@ -33,7 +34,7 @@ class _OnBoardingPageState extends State<OnBoardingPage>
 
   @override
   void initState() {
-    noteRoute = NoteRoute(note: widget.note, previewMode: true);
+    noteRoute = NoteRoute(note: widget.note, drawing: widget.drawing, previewMode: true);
 
     _animationModalController = AnimationController(
         duration: const Duration(milliseconds: 300),

@@ -9,14 +9,14 @@ part of 'notepad_database.dart';
 // ignore_for_file: unnecessary_brace_in_string_interps, unnecessary_this
 class Note extends DataClass implements Insertable<Note> {
   final int id;
-  final String paths;
+  final int drawingId;
   final String noteText;
   final String notePlainText;
   final DateTime noteDate;
   final String noteSettings;
   Note(
       {@required this.id,
-      this.paths,
+      this.drawingId,
       @required this.noteText,
       @required this.notePlainText,
       @required this.noteDate,
@@ -29,8 +29,8 @@ class Note extends DataClass implements Insertable<Note> {
     final dateTimeType = db.typeSystem.forDartType<DateTime>();
     return Note(
       id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
-      paths:
-          stringType.mapFromDatabaseResponse(data['${effectivePrefix}paths']),
+      drawingId:
+          intType.mapFromDatabaseResponse(data['${effectivePrefix}drawing_id']),
       noteText: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}note_text']),
       notePlainText: stringType
@@ -46,7 +46,7 @@ class Note extends DataClass implements Insertable<Note> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return Note(
       id: serializer.fromJson<int>(json['id']),
-      paths: serializer.fromJson<String>(json['paths']),
+      drawingId: serializer.fromJson<int>(json['drawingId']),
       noteText: serializer.fromJson<String>(json['noteText']),
       notePlainText: serializer.fromJson<String>(json['notePlainText']),
       noteDate: serializer.fromJson<DateTime>(json['noteDate']),
@@ -58,7 +58,7 @@ class Note extends DataClass implements Insertable<Note> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'paths': serializer.toJson<String>(paths),
+      'drawingId': serializer.toJson<int>(drawingId),
       'noteText': serializer.toJson<String>(noteText),
       'notePlainText': serializer.toJson<String>(notePlainText),
       'noteDate': serializer.toJson<DateTime>(noteDate),
@@ -70,8 +70,9 @@ class Note extends DataClass implements Insertable<Note> {
   NotesCompanion createCompanion(bool nullToAbsent) {
     return NotesCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
-      paths:
-          paths == null && nullToAbsent ? const Value.absent() : Value(paths),
+      drawingId: drawingId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(drawingId),
       noteText: noteText == null && nullToAbsent
           ? const Value.absent()
           : Value(noteText),
@@ -89,14 +90,14 @@ class Note extends DataClass implements Insertable<Note> {
 
   Note copyWith(
           {int id,
-          String paths,
+          int drawingId,
           String noteText,
           String notePlainText,
           DateTime noteDate,
           String noteSettings}) =>
       Note(
         id: id ?? this.id,
-        paths: paths ?? this.paths,
+        drawingId: drawingId ?? this.drawingId,
         noteText: noteText ?? this.noteText,
         notePlainText: notePlainText ?? this.notePlainText,
         noteDate: noteDate ?? this.noteDate,
@@ -106,7 +107,7 @@ class Note extends DataClass implements Insertable<Note> {
   String toString() {
     return (StringBuffer('Note(')
           ..write('id: $id, ')
-          ..write('paths: $paths, ')
+          ..write('drawingId: $drawingId, ')
           ..write('noteText: $noteText, ')
           ..write('notePlainText: $notePlainText, ')
           ..write('noteDate: $noteDate, ')
@@ -119,7 +120,7 @@ class Note extends DataClass implements Insertable<Note> {
   int get hashCode => $mrjf($mrjc(
       id.hashCode,
       $mrjc(
-          paths.hashCode,
+          drawingId.hashCode,
           $mrjc(
               noteText.hashCode,
               $mrjc(notePlainText.hashCode,
@@ -129,7 +130,7 @@ class Note extends DataClass implements Insertable<Note> {
       identical(this, other) ||
       (other is Note &&
           other.id == this.id &&
-          other.paths == this.paths &&
+          other.drawingId == this.drawingId &&
           other.noteText == this.noteText &&
           other.notePlainText == this.notePlainText &&
           other.noteDate == this.noteDate &&
@@ -138,14 +139,14 @@ class Note extends DataClass implements Insertable<Note> {
 
 class NotesCompanion extends UpdateCompanion<Note> {
   final Value<int> id;
-  final Value<String> paths;
+  final Value<int> drawingId;
   final Value<String> noteText;
   final Value<String> notePlainText;
   final Value<DateTime> noteDate;
   final Value<String> noteSettings;
   const NotesCompanion({
     this.id = const Value.absent(),
-    this.paths = const Value.absent(),
+    this.drawingId = const Value.absent(),
     this.noteText = const Value.absent(),
     this.notePlainText = const Value.absent(),
     this.noteDate = const Value.absent(),
@@ -153,7 +154,7 @@ class NotesCompanion extends UpdateCompanion<Note> {
   });
   NotesCompanion.insert({
     this.id = const Value.absent(),
-    this.paths = const Value.absent(),
+    this.drawingId = const Value.absent(),
     @required String noteText,
     @required String notePlainText,
     @required DateTime noteDate,
@@ -164,14 +165,14 @@ class NotesCompanion extends UpdateCompanion<Note> {
         noteSettings = Value(noteSettings);
   NotesCompanion copyWith(
       {Value<int> id,
-      Value<String> paths,
+      Value<int> drawingId,
       Value<String> noteText,
       Value<String> notePlainText,
       Value<DateTime> noteDate,
       Value<String> noteSettings}) {
     return NotesCompanion(
       id: id ?? this.id,
-      paths: paths ?? this.paths,
+      drawingId: drawingId ?? this.drawingId,
       noteText: noteText ?? this.noteText,
       notePlainText: notePlainText ?? this.notePlainText,
       noteDate: noteDate ?? this.noteDate,
@@ -193,13 +194,13 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
         hasAutoIncrement: true, declaredAsPrimaryKey: true);
   }
 
-  final VerificationMeta _pathsMeta = const VerificationMeta('paths');
-  GeneratedTextColumn _paths;
+  final VerificationMeta _drawingIdMeta = const VerificationMeta('drawingId');
+  GeneratedIntColumn _drawingId;
   @override
-  GeneratedTextColumn get paths => _paths ??= _constructPaths();
-  GeneratedTextColumn _constructPaths() {
-    return GeneratedTextColumn(
-      'paths',
+  GeneratedIntColumn get drawingId => _drawingId ??= _constructDrawingId();
+  GeneratedIntColumn _constructDrawingId() {
+    return GeneratedIntColumn(
+      'drawing_id',
       $tableName,
       true,
     );
@@ -259,7 +260,7 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
 
   @override
   List<GeneratedColumn> get $columns =>
-      [id, paths, noteText, notePlainText, noteDate, noteSettings];
+      [id, drawingId, noteText, notePlainText, noteDate, noteSettings];
   @override
   $NotesTable get asDslTable => this;
   @override
@@ -273,9 +274,9 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
     if (d.id.present) {
       context.handle(_idMeta, id.isAcceptableValue(d.id.value, _idMeta));
     }
-    if (d.paths.present) {
-      context.handle(
-          _pathsMeta, paths.isAcceptableValue(d.paths.value, _pathsMeta));
+    if (d.drawingId.present) {
+      context.handle(_drawingIdMeta,
+          drawingId.isAcceptableValue(d.drawingId.value, _drawingIdMeta));
     }
     if (d.noteText.present) {
       context.handle(_noteTextMeta,
@@ -322,8 +323,8 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
     if (d.id.present) {
       map['id'] = Variable<int, IntType>(d.id.value);
     }
-    if (d.paths.present) {
-      map['paths'] = Variable<String, StringType>(d.paths.value);
+    if (d.drawingId.present) {
+      map['drawing_id'] = Variable<int, IntType>(d.drawingId.value);
     }
     if (d.noteText.present) {
       map['note_text'] = Variable<String, StringType>(d.noteText.value);
@@ -347,12 +348,168 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
   }
 }
 
+class Drawing extends DataClass implements Insertable<Drawing> {
+  final int id;
+  final String paths;
+  Drawing({@required this.id, this.paths});
+  factory Drawing.fromData(Map<String, dynamic> data, GeneratedDatabase db,
+      {String prefix}) {
+    final effectivePrefix = prefix ?? '';
+    final intType = db.typeSystem.forDartType<int>();
+    final stringType = db.typeSystem.forDartType<String>();
+    return Drawing(
+      id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
+      paths:
+          stringType.mapFromDatabaseResponse(data['${effectivePrefix}paths']),
+    );
+  }
+  factory Drawing.fromJson(Map<String, dynamic> json,
+      {ValueSerializer serializer}) {
+    serializer ??= moorRuntimeOptions.defaultSerializer;
+    return Drawing(
+      id: serializer.fromJson<int>(json['id']),
+      paths: serializer.fromJson<String>(json['paths']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer serializer}) {
+    serializer ??= moorRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'paths': serializer.toJson<String>(paths),
+    };
+  }
+
+  @override
+  DrawingsCompanion createCompanion(bool nullToAbsent) {
+    return DrawingsCompanion(
+      id: id == null && nullToAbsent ? const Value.absent() : Value(id),
+      paths:
+          paths == null && nullToAbsent ? const Value.absent() : Value(paths),
+    );
+  }
+
+  Drawing copyWith({int id, String paths}) => Drawing(
+        id: id ?? this.id,
+        paths: paths ?? this.paths,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('Drawing(')
+          ..write('id: $id, ')
+          ..write('paths: $paths')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => $mrjf($mrjc(id.hashCode, paths.hashCode));
+  @override
+  bool operator ==(dynamic other) =>
+      identical(this, other) ||
+      (other is Drawing && other.id == this.id && other.paths == this.paths);
+}
+
+class DrawingsCompanion extends UpdateCompanion<Drawing> {
+  final Value<int> id;
+  final Value<String> paths;
+  const DrawingsCompanion({
+    this.id = const Value.absent(),
+    this.paths = const Value.absent(),
+  });
+  DrawingsCompanion.insert({
+    this.id = const Value.absent(),
+    this.paths = const Value.absent(),
+  });
+  DrawingsCompanion copyWith({Value<int> id, Value<String> paths}) {
+    return DrawingsCompanion(
+      id: id ?? this.id,
+      paths: paths ?? this.paths,
+    );
+  }
+}
+
+class $DrawingsTable extends Drawings with TableInfo<$DrawingsTable, Drawing> {
+  final GeneratedDatabase _db;
+  final String _alias;
+  $DrawingsTable(this._db, [this._alias]);
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  GeneratedIntColumn _id;
+  @override
+  GeneratedIntColumn get id => _id ??= _constructId();
+  GeneratedIntColumn _constructId() {
+    return GeneratedIntColumn('id', $tableName, false,
+        hasAutoIncrement: true, declaredAsPrimaryKey: true);
+  }
+
+  final VerificationMeta _pathsMeta = const VerificationMeta('paths');
+  GeneratedTextColumn _paths;
+  @override
+  GeneratedTextColumn get paths => _paths ??= _constructPaths();
+  GeneratedTextColumn _constructPaths() {
+    return GeneratedTextColumn(
+      'paths',
+      $tableName,
+      true,
+    );
+  }
+
+  @override
+  List<GeneratedColumn> get $columns => [id, paths];
+  @override
+  $DrawingsTable get asDslTable => this;
+  @override
+  String get $tableName => _alias ?? 'drawings';
+  @override
+  final String actualTableName = 'drawings';
+  @override
+  VerificationContext validateIntegrity(DrawingsCompanion d,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    if (d.id.present) {
+      context.handle(_idMeta, id.isAcceptableValue(d.id.value, _idMeta));
+    }
+    if (d.paths.present) {
+      context.handle(
+          _pathsMeta, paths.isAcceptableValue(d.paths.value, _pathsMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Drawing map(Map<String, dynamic> data, {String tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
+    return Drawing.fromData(data, _db, prefix: effectivePrefix);
+  }
+
+  @override
+  Map<String, Variable> entityToSql(DrawingsCompanion d) {
+    final map = <String, Variable>{};
+    if (d.id.present) {
+      map['id'] = Variable<int, IntType>(d.id.value);
+    }
+    if (d.paths.present) {
+      map['paths'] = Variable<String, StringType>(d.paths.value);
+    }
+    return map;
+  }
+
+  @override
+  $DrawingsTable createAlias(String alias) {
+    return $DrawingsTable(_db, alias);
+  }
+}
+
 abstract class _$NotepadDatabase extends GeneratedDatabase {
   _$NotepadDatabase(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
   $NotesTable _notes;
   $NotesTable get notes => _notes ??= $NotesTable(this);
+  $DrawingsTable _drawings;
+  $DrawingsTable get drawings => _drawings ??= $DrawingsTable(this);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [notes];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [notes, drawings];
 }

@@ -8,11 +8,12 @@ import 'package:page_transition/page_transition.dart';
 import 'note/note_route.dart';
 
 class AppNavigator {
-  static void navigateToNoteEdit(BuildContext context, Note note) {
+  static void navigateToNoteEdit(BuildContext context, Note note, Drawing drawing) {
     Navigator.of(context)
         .push(MaterialPageRoute<Null>(builder: (BuildContext context) {
       return NoteRoute(
         note: note,
+        drawing: drawing,
         previewMode: false,
       );
     }));
@@ -26,10 +27,10 @@ class AppNavigator {
   }
 
   // Nullable note
-  static void navigateToIntro(BuildContext context, Note note) {
+  static void navigateToIntro(BuildContext context, Note note, Drawing drawing) {
     Navigator.of(context).pushAndRemoveUntil(
       PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => OnBoardingPage(note: note,)),
+          pageBuilder: (context, animation1, animation2) => OnBoardingPage(note: note, drawing: drawing,)),
       (Route<dynamic> route) => false,
     );
   }

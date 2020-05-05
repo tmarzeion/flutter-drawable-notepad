@@ -79,7 +79,11 @@ class _InitRouteState extends State<InitRoute> {
           else
             {
               IntroSamples.getSampleNote(context).then(
-                  (value) => {AppNavigator.navigateToIntro(context, value)})
+                  (note) => {
+                    IntroSamples.getSampleDrawing(context).then((drawing) => {
+                      AppNavigator.navigateToIntro(context, note, drawing)
+                    })
+                  })
             }
         });
   }

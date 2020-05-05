@@ -18,9 +18,11 @@ import 'views/paint_picker.dart';
 import 'views/paint_picker_menu_item.dart';
 
 class NoteRoute extends StatefulWidget {
-  NoteRoute({Key key, this.note, this.previewMode}) : super(key: key);
+  NoteRoute({Key key, this.note, this.drawing, this.previewMode})
+      : super(key: key);
 
   Note note;
+  Drawing drawing;
   bool previewMode = false;
 
   @override
@@ -99,7 +101,7 @@ class _NoteRouteState extends State<NoteRoute>
   // TODO: Provide it via DI
   PainterController _getPainterController() {
     PainterController controller = new PainterController(
-        widget.note != null ? widget.note.paths : null,
+        widget.note != null ? widget.drawing?.paths : null,
         compressionLevel: Settings.painterPathCompressionLevel);
     if (widget.note != null) {
       NoteSettings settings = NoteSettingsConverter.fromNote(widget.note);
@@ -194,36 +196,37 @@ class _NoteRouteState extends State<NoteRoute>
                     Opacity(opacity: 0, child: menuItems[1]),
                   IgnorePointer(
                     ignoring:
-                    shouldIgnoreTextEditorClicks || widget.previewMode,
-                    child: _drawModeController.bottomBarVisible() && !_drawModeController.isDrawMode() ? scaffoldZefyr() : _zefyr,
+                        shouldIgnoreTextEditorClicks || widget.previewMode,
+                    child: _drawModeController.bottomBarVisible() &&
+                            !_drawModeController.isDrawMode()
+                        ? scaffoldZefyr()
+                        : _zefyr,
                   ),
                   Padding(
                     padding: EdgeInsets.only(bottom: bottomPainterPadding),
                     child: IgnorePointer(
-                      ignoring:
-                      shouldIgnorePainterClicks || widget.previewMode,
+                      ignoring: shouldIgnorePainterClicks || widget.previewMode,
                       child: SingleChildScrollView(
                         physics: NeverScrollableScrollPhysics(),
                         controller: _scrollControllerForPainter,
                         child: Container(
                           height: 1920,
                           child: Opacity(
-                              opacity: 0.6,
-                              child: Painter(_painterController)),
+                              opacity: 0.6, child: Painter(_painterController)),
                         ),
                       ),
                     ),
                   ),
                   Visibility(
                     visible:
-                    shouldIgnoreTextEditorClicks && !widget.previewMode,
+                        shouldIgnoreTextEditorClicks && !widget.previewMode,
                     child: Align(
                       alignment: AlignmentDirectional.bottomCenter,
                       child: Container(
                           height: Settings.bottomBarHeight,
                           child: PaintPicker(_painterController,
                               onUpdateNoteSettingsListener:
-                              startSaveNoteTimer)),
+                                  startSaveNoteTimer)),
                     ),
                   )
                 ],
@@ -263,34 +266,52 @@ class _NoteRouteState extends State<NoteRoute>
   }
 
   Future<bool> _saveNote({isPopping = false}) async {
-
     String paintHistory = _painterController.history;
     String noteSettings = _getCurrentNoteSettings();
 
     if (isNotBlank(_zefyrController.document.toPlainText()) ||
         paintHistory.length >= 3) {
       final noteText = jsonEncode(_zefyrController.document);
-      if (widget.note != null) {
+      if (widget.note != null && widget.drawing != null) {
         if (widget.note.noteText != noteText ||
-            widget.note.paths != paintHistory ||
             widget.note.noteSettings != noteSettings) {
           var newNote = widget.note.copyWith(
               noteText: noteText,
               notePlainText: _zefyrController.document.toPlainText(),
-              paths: paintHistory == null ? "[]" : paintHistory,
               noteSettings: noteSettings);
           database.updateNote(newNote);
           widget.note = newNote;
         }
+        if (widget.drawing.paths != paintHistory) {
+          var newDrawing = widget.drawing
+              .copyWith(paths: paintHistory == null ? "[]" : paintHistory);
+          database.updateDrawing(newDrawing);
+          widget.drawing = newDrawing;
+        }
       } else {
-        var newNote = Note(
-            noteText: noteText,
-            notePlainText: _zefyrController.document.toPlainText(),
-            noteDate: new DateTime.now(),
-            noteSettings: noteSettings,
-            paths: paintHistory);
-        var noteId = await database.insertNote(newNote);
-        widget.note = newNote.copyWith(id: noteId);
+        database
+            .insertDrawing(Drawing(paths: paintHistory))
+            .then((drawingId) => {
+                  widget.drawing = Drawing(id: drawingId, paths: paintHistory),
+                  database
+                      .insertNote(Note(
+                          noteText: noteText,
+                          notePlainText:
+                              _zefyrController.document.toPlainText(),
+                          noteDate: new DateTime.now(),
+                          noteSettings: noteSettings,
+                          drawingId: drawingId))
+                      .then((noteId) => {
+                            widget.note = Note(
+                                id: noteId,
+                                noteText: noteText,
+                                notePlainText:
+                                    _zefyrController.document.toPlainText(),
+                                noteDate: new DateTime.now(),
+                                noteSettings: noteSettings,
+                                drawingId: drawingId)
+                          })
+                });
       }
     } else {
       if (widget.note != null && isPopping) {

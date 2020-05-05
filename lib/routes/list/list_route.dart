@@ -102,7 +102,7 @@ class _ListRouteState extends State<ListRoute> {
       body: notesList,
       floatingActionButton: FloatingActionButton(
         tooltip: AppLocalizations.of(context).translate('addNoteFABTooltip'),
-        onPressed: () => AppNavigator.navigateToNoteEdit(context, null),
+        onPressed: () => AppNavigator.navigateToNoteEdit(context, null, null),
         child: Icon(Icons.add),
       ),
     );
