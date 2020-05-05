@@ -15,9 +15,10 @@ Features:
 - Share feature
 - Supported languages: English, Polish, Danish, German, Russian, French, Japanese, Spanish
 - Interactive intro screen
+- Search feature
 
 TODO:
-- Search feature
+- Optimization
 - Tests + CI
 - Architecture refactor (DI, State management, clean arch)
 
