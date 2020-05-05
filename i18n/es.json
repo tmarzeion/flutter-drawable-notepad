@@ -1,0 +1,20 @@
+{
+    "appTitle": "Cuardeno de dibujo",
+    "eraseAlertTitle": "\u00bfSeguro?",
+    "eraseAlertContent": "Si presionas el bot\u00f3n de borrar durante un tiempo, borrar\u00e1s todo el dibujo",
+    "eraseAlertYes": "Borrar",
+    "eraseAlertNo": "Cancelar",
+    "notesListRouteToolbarTitle": "Cuaderno",
+    "noteRouteToolbarTitle": "Nota",
+    "addNoteFABTooltip": "Agregar nota",
+    "noteItemDefaultTitle": "Nueva nota",
+    "noteItemHandwrittenNoteTitle": "Nota a mano",
+    "noteItemDefaultAlternativeTitle": "Sin texto adicional",
+    "noteItemYesterdayText": "Ayer",
+    "shareNoteText": "Nota del cuaderno para dibujar",
+    "searchBarTypeToSearch": "Escribir para buscar",
+    "searchBarNotFound": "No se encontraron notas con \"%s\"",
+    "tutorialClickHereToAddNewNote": "Haz clic aqu\u00ed para agregar una nota nueva",
+    "tutorialLongPressForPreview": "Presiona por un tiempo para mostrar la vista previa de la nota",
+    "tutorialSwipeToShareDelete": "Desliza para compartir\/eliminar la nota"
+}

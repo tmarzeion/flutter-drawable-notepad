@@ -1,0 +1,20 @@
+{
+    "appTitle": "Carnet de croquis\u00a02",
+    "eraseAlertTitle": "\u00cates-vous s\u00fbr\u00a0?",
+    "eraseAlertContent": "Un appui prolong\u00e9 sur le bouton effacer effacera le dessin entier",
+    "eraseAlertYes": "Effacer",
+    "eraseAlertNo": "Annuler",
+    "notesListRouteToolbarTitle": "Carnet",
+    "noteRouteToolbarTitle": "Note",
+    "addNoteFABTooltip": "Ajouter une note",
+    "noteItemDefaultTitle": "Nouvelle note",
+    "noteItemHandwrittenNoteTitle": "Note manuscrite",
+    "noteItemDefaultAlternativeTitle": "Aucun texte suppl\u00e9mentaire",
+    "noteItemYesterdayText": "Hier",
+    "shareNoteText": "Note de carnet de dessin",
+    "searchBarTypeToSearch": "Tapez pour rechercher",
+    "searchBarNotFound": "Aucune note incluant le texte \u00ab\u00a0%s\u00a0\u00bb n'a \u00e9t\u00e9 trouv\u00e9e",
+    "tutorialClickHereToAddNewNote": "Cliquez ici pour ajouter une nouvelle note",
+    "tutorialLongPressForPreview": "Faites un appui prolong\u00e9 pour afficher un aper\u00e7u de la note",
+    "tutorialSwipeToShareDelete": "Faites glisser pour partager ou supprimer la note"
+}

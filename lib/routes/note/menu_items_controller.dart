@@ -4,29 +4,29 @@ import 'package:flutter/widgets.dart';
 
 class DrawModeController {
 
-  DrawModeController({this.fontPickerKey, this.paintPickerkey, this.onToolbarStateChanged});
+  DrawModeController({this.fontPickerKey, this.paintPickerKey, this.onToolbarStateChanged});
 
   GlobalKey<FontPickerMenuItemState> fontPickerKey;
-  GlobalKey<PaintPickerMenuItemState> paintPickerkey;
+  GlobalKey<PaintPickerMenuItemState> paintPickerKey;
   Function onToolbarStateChanged;
 
   bool bottomBarVisible() {
-    if(fontPickerKey.currentState?.getState() != null && paintPickerkey.currentState?.getState() != null) {
-      return fontPickerKey.currentState.getState() || paintPickerkey.currentState.getState();
+    if(fontPickerKey.currentState?.getState() != null && paintPickerKey.currentState?.getState() != null) {
+      return fontPickerKey.currentState.getState() || paintPickerKey.currentState.getState();
     }
     return false;
   }
 
   bool isDrawMode() {
-    if (paintPickerkey.currentState?.getState() != null) {
-      return paintPickerkey.currentState.getState();
+    if (paintPickerKey.currentState?.getState() != null) {
+      return paintPickerKey.currentState.getState();
     }
     return false;
   }
 
   bool isTextMode() {
-    if (paintPickerkey.currentState?.getState() != null) {
-      return !paintPickerkey.currentState.getState();
+    if (paintPickerKey.currentState?.getState() != null) {
+      return !paintPickerKey.currentState.getState();
     }
     return true;
   }
@@ -35,26 +35,34 @@ class DrawModeController {
     fontPickerKey.currentState.isOpen = visible;
     onToolbarStateChanged?.call();
     if (visible) {
-      _hidePaintPicker();
+      hidePaintPicker();
     }
   }
 
-  _hideFontPicker() {
+  hideFontPicker() {
     fontPickerKey.currentState.close();
   }
 
-  _hidePaintPicker() {
-    paintPickerkey.currentState.close();
+  hidePaintPicker() {
+    paintPickerKey.currentState.close();
+  }
+
+  openPaintPicker() {
+    paintPickerKey?.currentState?.open();
+  }
+
+  openFontPicker() {
+    fontPickerKey?.currentState?.open();
   }
 
   toggleFontPicker() {
+    hidePaintPicker();
     _toggleCloseable(fontPickerKey.currentState);
-    _hidePaintPicker();
   }
 
   togglePaintPicker() {
-    _toggleCloseable(paintPickerkey.currentState);
-    _hideFontPicker();
+    hideFontPicker();
+    _toggleCloseable(paintPickerKey.currentState);
     onToolbarStateChanged?.call();
   }
 

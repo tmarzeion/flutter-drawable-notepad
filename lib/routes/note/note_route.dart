@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:drawablenotepadflutter/data/NoteSettingsConverter.dart';
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:drawablenotepadflutter/routes/note/views/font_picker_menu_item.dart';
+import 'package:drawablenotepadflutter/translations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:painter/painter.dart';
@@ -9,135 +12,322 @@ import 'package:provider/provider.dart';
 import 'package:zefyr/zefyr.dart';
 import 'package:quiver/strings.dart';
 
+import '../../const.dart';
 import 'menu_items_controller.dart';
+import 'views/paint_picker.dart';
 import 'views/paint_picker_menu_item.dart';
 
 class NoteRoute extends StatefulWidget {
-  NoteRoute({Key key, this.note}) : super(key: key);
+  NoteRoute({Key key, this.note, this.drawing, this.previewMode})
+      : super(key: key);
 
   Note note;
+  Drawing drawing;
+  bool previewMode = false;
 
   @override
   _NoteRouteState createState() => _NoteRouteState();
 }
 
-class _NoteRouteState extends State<NoteRoute> {
-  /// Allows to control the editor and the document.
-  ZefyrController _zefyrController; //TODO bar visibility listener
+class _NoteRouteState extends State<NoteRoute>
+    with SingleTickerProviderStateMixin {
+  // Controllers
+  ZefyrController _zefyrController;
   PainterController _painterController;
   DrawModeController _drawModeController;
+  ScrollController _scrollControllerForText = new ScrollController();
+  ScrollController _scrollControllerForPainter = new ScrollController();
 
-  /// Zefyr editor like any other input field requires a focus node.
+  AnimationController _keyboardAnimationController;
+  Animation _animation;
+
+  NotepadDatabase database;
+
+  // For zefyr
   FocusNode _focusNode;
+  ZefyrScaffold _zefyr;
 
-  final _fontPickerKey = GlobalKey<FontPickerMenuItemState>();
-  final _paintPickerkey = GlobalKey<PaintPickerMenuItemState>();
+  Timer saveNoteTimer;
+
+  bool initialized = false;
+
+  // Keys
+  final _fontPickerMenuKey = GlobalKey<FontPickerMenuItemState>();
+  final _paintPickerMenuKey = GlobalKey<PaintPickerMenuItemState>();
 
   @override
   void initState() {
     super.initState();
-    // Here we must load the document and pass it to Zefyr controller.
+
+    database = Provider.of<NotepadDatabase>(context, listen: false);
+
+    // Init zefyr
     final document = _loadDocument();
     _zefyrController = ZefyrController(document,
         onToolbarVisibilityChange: (visible) =>
             {_drawModeController.onFontPickerVisibilityChanged(visible)});
-    _painterController = _getPainterController();
-    _drawModeController = DrawModeController(
-        fontPickerKey: _fontPickerKey,
-        paintPickerkey: _paintPickerkey,
-        onToolbarStateChanged: () => setState(() => print(''))); //TODO ?
+    _zefyrController.addListener(startSaveNoteTimer);
     _focusNode = FocusNode();
+
+    // Init painter
+    _painterController = _getPainterController();
+
+    // Init mode controller
+    _drawModeController = DrawModeController(
+        fontPickerKey: _fontPickerMenuKey,
+        paintPickerKey: _paintPickerMenuKey,
+        onToolbarStateChanged: () => setState(() {
+              startSaveNoteTimer();
+            }));
+
+    _keyboardAnimationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 200));
+
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        _keyboardAnimationController.forward();
+      } else {
+        _keyboardAnimationController.reverse();
+      }
+    });
+
+    _scrollControllerForText.addListener(() {
+      _scrollControllerForPainter.jumpTo(_scrollControllerForText.offset);
+    });
+
+    scaffoldZefyr();
   }
 
   // TODO: Provide it via DI
   PainterController _getPainterController() {
-    PainterController controller =
-        new PainterController(widget.note != null ? widget.note.paths : null);
-    controller.thickness = 5.0;
-    controller.drawColor = Colors.amber
-        .withAlpha(220); //TODO Use default colors list from paintpicker
+    PainterController controller = new PainterController(
+        widget.note != null ? widget.drawing?.paths : null,
+        compressionLevel: Settings.painterPathCompressionLevel);
+    if (widget.note != null) {
+      NoteSettings settings = NoteSettingsConverter.fromNote(widget.note);
+      controller.thickness = settings.paintThickness;
+      controller.drawColor = Color.fromARGB(Settings.paintColorAlpha,
+          settings.paintR, settings.paintG, settings.paintB);
+    } else {
+      controller.thickness =
+          Settings.drawThicknessModes[Settings.defaultThicknessMode].thickness;
+      controller.drawColor =
+          Settings.defaultColor.withAlpha(Settings.paintColorAlpha);
+    }
     controller.backgroundColor = Colors.transparent;
+    controller.setOnDrawStepListener(startSaveNoteTimer);
     return controller;
   }
 
   @override
   Widget build(BuildContext context) {
+    double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    if (_animation == null) {
+      if (keyboardHeight > 0) {
+        _animation = Tween(begin: 0.0, end: keyboardHeight)
+            .animate(_keyboardAnimationController)
+              ..addListener(() {
+                setState(() {});
+              });
+      }
+    } else {
+      if (keyboardHeight == 0 &&
+          _animation.value > 0 &&
+          _animation.isCompleted) {
+        _drawModeController.hideFontPicker();
+      }
+    }
+
     // Note that the editor requires special `ZefyrScaffold` widget to be
     // one of its parents.
+    bool shouldIgnoreTextEditorClicks = _drawModeController.isDrawMode();
+    bool shouldIgnorePainterClicks = _drawModeController.isTextMode();
+
+    if (!initialized) {
+      if (widget.note != null) {
+        var initialDrawModeOn =
+            NoteSettingsConverter.fromNote(widget.note).drawMode;
+        shouldIgnoreTextEditorClicks = initialDrawModeOn;
+        shouldIgnorePainterClicks = !initialDrawModeOn;
+      }
+    }
     final double bottomPainterPadding = _drawModeController.bottomBarVisible()
         ? ZefyrToolbar.kToolbarHeight
         : 0.0;
-    return WillPopScope(
+
+    final menuItems = <Widget>[
+      FontPickerMenuItem(
+        previewMode: widget.previewMode,
+        key: _fontPickerMenuKey,
+        onPressed: _drawModeController.toggleFontPicker,
+        focusNode: _focusNode,
+        openOnStart: widget.note != null || widget.previewMode ? false : true,
+      ),
+      PaintPickerMenuItem(
+          previewMode: widget.previewMode,
+          key: _paintPickerMenuKey,
+          painterController: _painterController,
+          onPressed: _drawModeController.togglePaintPicker,
+          openOnStart: widget.note != null
+              ? NoteSettingsConverter.fromNote(widget.note).drawMode
+              : false)
+    ];
+
+    final view = WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text("Note"),
-          actions: <Widget>[
-            FontPickerMenuItem(
-              key: _fontPickerKey,
-              onPressed: _drawModeController.toggleFontPicker,
-              focusNode: _focusNode,
-            ),
-            PaintPickerMenuItem(
-                key: _paintPickerkey,
-                painterController: _painterController,
-                onPressed: _drawModeController.togglePaintPicker)
-          ],
-        ),
-        body: Stack(
-          children: [
-            IgnorePointer(
-              ignoring: _drawModeController.isDrawMode(),
-              child: ZefyrScaffold(
-                child: ZefyrEditor(
-                  padding: EdgeInsets.all(16),
-                  controller: _zefyrController,
-                  focusNode: _focusNode,
-                ),
+        resizeToAvoidBottomPadding: false, // this avoids the overflow error
+        appBar: widget.previewMode
+            ? null
+            : AppBar(
+                title: Text(AppLocalizations.of(context)
+                    .translate('noteRouteToolbarTitle')),
+                actions: menuItems,
+              ),
+        body: Column(
+          children: <Widget>[
+            Expanded(
+              child: Stack(
+                children: [
+                  // Ugly hack to prevent keyboard from showing on preview mode«
+                  if (widget.previewMode)
+                    Opacity(opacity: 0, child: menuItems[0]),
+                  if (widget.previewMode)
+                    Opacity(opacity: 0, child: menuItems[1]),
+                  IgnorePointer(
+                    ignoring:
+                        shouldIgnoreTextEditorClicks || widget.previewMode,
+                    child: _drawModeController.bottomBarVisible() &&
+                            !_drawModeController.isDrawMode()
+                        ? scaffoldZefyr()
+                        : _zefyr,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: bottomPainterPadding),
+                    child: IgnorePointer(
+                      ignoring: shouldIgnorePainterClicks || widget.previewMode,
+                      child: SingleChildScrollView(
+                        physics: NeverScrollableScrollPhysics(),
+                        controller: _scrollControllerForPainter,
+                        child: Container(
+                          height: 1920,
+                          child: Opacity(
+                              opacity: 0.6, child: Painter(_painterController)),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Visibility(
+                    visible:
+                        shouldIgnoreTextEditorClicks && !widget.previewMode,
+                    child: Align(
+                      alignment: AlignmentDirectional.bottomCenter,
+                      child: Container(
+                          height: Settings.bottomBarHeight,
+                          child: PaintPicker(_painterController,
+                              onUpdateNoteSettingsListener:
+                                  startSaveNoteTimer)),
+                    ),
+                  )
+                ],
               ),
             ),
-            IgnorePointer(
-              ignoring: _drawModeController.isTextMode(),
-              child: Padding(
-                padding: EdgeInsets.only(bottom: bottomPainterPadding),
-                child:
-                    Opacity(opacity: 0.6, child: Painter(_painterController)),
-              ),
-            )
+            Container(color: Colors.transparent, height: _animation?.value ?? 0)
           ],
         ),
       ),
     );
+    initialized = true;
+    return view;
+  }
+
+  ZefyrScaffold scaffoldZefyr() {
+    _zefyr = ZefyrScaffold(
+      child: ZefyrEditor(
+        scrollController: _scrollControllerForText,
+        padding: EdgeInsets.all(16),
+        controller: _zefyrController,
+        focusNode: _focusNode,
+      ),
+    );
+    return _zefyr;
   }
 
   Future<bool> _onWillPop() async {
+    saveNoteTimer?.cancel();
+    return _saveNote(isPopping: true);
+  }
 
-    if (_drawModeController.isDrawMode()) return true;
+  startSaveNoteTimer() {
+    saveNoteTimer?.cancel();
+    saveNoteTimer = new Timer(
+        Duration(milliseconds: Settings.saveNoteTimerDurationMillis),
+        () => {_saveNote()});
+  }
 
-    /// Loads the document to be edited in Zefyr.
-    final database = Provider.of<NotepadDatabase>(context, listen: false);
-
+  Future<bool> _saveNote({isPopping = false}) async {
     String paintHistory = _painterController.history;
+    String noteSettings = _getCurrentNoteSettings();
 
-    if (isNotBlank(_zefyrController.document.toPlainText()) || paintHistory.length >= 3) {
+    if (isNotBlank(_zefyrController.document.toPlainText()) ||
+        paintHistory.length >= 3) {
       final noteText = jsonEncode(_zefyrController.document);
-      if (widget.note != null) {
-        if (widget.note.noteText != noteText || widget.note.paths != paintHistory) {
-          database.updateNote(widget.note
-              .copyWith(noteText: noteText, paths: paintHistory == null ? "[]" : paintHistory));
+      if (widget.note != null && widget.drawing != null) {
+        if (widget.note.noteText != noteText ||
+            widget.note.noteSettings != noteSettings) {
+          var newNote = widget.note.copyWith(
+              noteText: noteText,
+              notePlainText: _zefyrController.document.toPlainText(),
+              noteSettings: noteSettings);
+          database.updateNote(newNote);
+          widget.note = newNote;
+        }
+        if (widget.drawing.paths != paintHistory) {
+          var newDrawing = widget.drawing
+              .copyWith(paths: paintHistory == null ? "[]" : paintHistory);
+          database.updateDrawing(newDrawing);
+          widget.drawing = newDrawing;
         }
       } else {
-        database.insertNote(Note(
-            noteText: noteText,
-            noteDate: new DateTime.now(),
-            paths: paintHistory));
+        database
+            .insertDrawing(Drawing(paths: paintHistory))
+            .then((drawingId) => {
+                  widget.drawing = Drawing(id: drawingId, paths: paintHistory),
+                  database
+                      .insertNote(Note(
+                          noteText: noteText,
+                          notePlainText:
+                              _zefyrController.document.toPlainText(),
+                          noteDate: new DateTime.now(),
+                          noteSettings: noteSettings,
+                          drawingId: drawingId))
+                      .then((noteId) => {
+                            widget.note = Note(
+                                id: noteId,
+                                noteText: noteText,
+                                notePlainText:
+                                    _zefyrController.document.toPlainText(),
+                                noteDate: new DateTime.now(),
+                                noteSettings: noteSettings,
+                                drawingId: drawingId)
+                          })
+                });
       }
     } else {
-      if (widget.note != null) {
+      if (widget.note != null && isPopping) {
         database.deleteNote(widget.note);
       }
     }
     return true;
+  }
+
+  String _getCurrentNoteSettings() {
+    return json.encode(NoteSettings(
+        _drawModeController.isDrawMode(),
+        _painterController.drawColor.red,
+        _painterController.drawColor.green,
+        _painterController.drawColor.blue,
+        _painterController.thickness));
   }
 
   /// Loads the document to be edited in Zefyr.

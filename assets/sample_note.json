@@ -1,0 +1,7 @@
+{
+  "id":-1,
+  "drawingId":2137,
+  "noteText":"[{\"insert\":\"This is very important note!\"},{\"insert\":\"\\n\",\"attributes\":{\"heading\":2}},{\"insert\":\"\\\"You miss 100% of the shots you don't take. - Wayne Gretzky\\\"\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"quote\"}},{\"insert\":\"~ Michael Scott\",\"attributes\":{\"i\":true}},{\"insert\":\"\\nfun isPcTheBestGamingPlatform(): Boolean {\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"code\"}},{\"insert\":\"    return true\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"code\"}},{\"insert\":\"}\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"code\"}},{\"insert\":\"Shopping list:\\nDoritos\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ul\"}},{\"insert\":\"Mountain Dew\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ul\"}},{\"insert\":\"Beer\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ul\"}},{\"insert\":\"More beer\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ul\"}},{\"insert\":\"Plan for today:\\nCS\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ol\"}},{\"insert\":\"LoL\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ol\"}},{\"insert\":\"Netflix and Chill\"},{\"insert\":\"\\n\",\"attributes\":{\"block\":\"ol\"}}]",
+  "noteDate":1588106977000,
+  "noteSettings":"{\"drawMode\":false,\"paintR\":205,\"paintG\":220,\"paintB\":57,\"paintThickness\":14.0}"
+}

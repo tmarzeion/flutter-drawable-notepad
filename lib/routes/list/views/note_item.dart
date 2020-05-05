@@ -1,18 +1,22 @@
+import 'package:drawablenotepadflutter/const.dart';
 import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:drawablenotepadflutter/routes/app_navigator.dart';
+import 'package:drawablenotepadflutter/translations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
-
 import 'package:quiver/strings.dart';
 import 'package:zefyr/zefyr.dart';
 
 class NoteItem extends StatefulWidget {
-  NoteItem({Key key, this.note}) : super(key: key);
+  NoteItem({Key key, this.note, this.onNotePreviewRequested, this.demoMode})
+      : super(key: key);
 
   final Note note;
+  final Function onNotePreviewRequested;
+  final bool demoMode;
 
   @override
   State<StatefulWidget> createState() {
@@ -37,7 +41,7 @@ class NoteItemState extends State<NoteItem> {
       actionPane: SlidableDrawerActionPane(),
       secondaryActions: <Widget>[
         IconSlideAction(
-          color: Colors.red.withAlpha(200),
+          color: Settings.swipeDeleteBackgroundColor,
           iconWidget: Container(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -45,62 +49,91 @@ class NoteItemState extends State<NoteItem> {
               children: [
                 Icon(
                   Icons.delete,
-                  color: Colors.white,
-                  size: 40,
+                  color: Settings.swipeDeleteIconColor,
+                  size: Settings.swipeDeleteIconSize,
                 )
               ],
             ),
           ),
           //icon: Icons.delete,
-          onTap: () => database.deleteNote(widget.note),
+          onTap: () => _deleteNote(database),
+        ),
+        IconSlideAction(
+          color: Settings.swipeShareBackgroundColor,
+          iconWidget: Container(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.share,
+                  color: Settings.swipeDeleteIconColor,
+                  size: Settings.swipeDeleteIconSize,
+                )
+              ],
+            ),
+          ),
+          //icon: Icons.delete,
+          onTap: _shareNote,
         )
       ],
-      child: InkWell(
-        onTap: () => AppNavigator.navigateToNoteEdit(context, note), //TODO
-        child: Padding(
-          padding: const EdgeInsets.only(
-              top: 8.0, bottom: 8.0, left: 16.0, right: 16.0),
-          child: Column(
-            children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: Text(
-                  _getFirstLineOfText(notePlainText),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16),
-                ),
-              ),
-              SizedBox(height: 4.0),
-              Row(
+      child: GestureDetector(
+        onLongPress: () =>
+            {widget.onNotePreviewRequested(widget.note, true, false)},
+        onLongPressEnd: (d) =>
+            widget.onNotePreviewRequested(widget.note, false, false),
+        child: InkWell(
+            onTap: () => {
+                  if (!widget.demoMode)
+                    {
+                      database.getDrawing(note.drawingId).then((drawing) => {
+                        AppNavigator.navigateToNoteEdit(context, note, drawing)
+                      })
+                    }
+                },
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  top: 8.0, bottom: 8.0, left: 16.0, right: 16.0),
+              child: Column(
                 children: [
-                  Text(_getDateTimeAsNonNerdText(note.noteDate),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      _getFirstLineOfText(notePlainText),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Colors.grey[700])),
-                  SizedBox(width: 8.0),
-                  Flexible(
-                    child: Container(
-                      child: Text(
-                        _getSecondLineOfText(notePlainText),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.grey[500]),
-                      ),
+                      style: TextStyle(
+                          color: Settings.noteItemTitleColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
                     ),
+                  ),
+                  SizedBox(height: 4.0),
+                  Row(
+                    children: [
+                      Text(_getDateTimeAsNonNerdText(note.noteDate),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: Settings.noteItemDateColor)),
+                      SizedBox(width: 8.0),
+                      Flexible(
+                        child: Container(
+                          child: Text(
+                            _getSecondLineOfText(notePlainText),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: Settings.noteItemAlternativeTitleColor),
+                          ),
+                        ),
+                      )
+                    ],
                   )
                 ],
-              )
-            ],
-          ),
-        ),
+              ),
+            )),
       ),
     );
-
-    // TODO: Implement build
   }
 
   // Nullable
@@ -117,12 +150,20 @@ class NoteItemState extends State<NoteItem> {
   }
 
   String _getFirstLineOfText(String noteText) {
-    return _getNotBlankLine(noteText, 0) ?? "No title";
+    return _getNotBlankLine(noteText, 0) ??
+        AppLocalizations.of(context).translate('noteItemDefaultTitle');
   }
 
   // Nullable
   String _getSecondLineOfText(String noteText) {
-    return _getNotBlankLine(noteText, 1) ?? "No additional text";
+    if (_getNotBlankLine(noteText, 0) == null) {
+      return AppLocalizations.of(context)
+          .translate('noteItemHandwrittenNoteTitle');
+    } else {
+      return _getNotBlankLine(noteText, 1) ??
+          AppLocalizations.of(context)
+              .translate('noteItemDefaultAlternativeTitle');
+    }
   }
 
   String _getDateTimeAsNonNerdText(DateTime dateTime) {
@@ -133,13 +174,15 @@ class NoteItemState extends State<NoteItem> {
     switch (diffDays) {
       case 0:
         {
-          return DateFormat('HH:mm').format(dateTime);
+          return DateFormat(Settings.noteItemDateSameDayFormat)
+              .format(dateTime);
         }
         break;
 
       case 1:
         {
-          return "Yesterday";
+          return AppLocalizations.of(context)
+              .translate('noteItemYesterdayText');
         }
         break;
 
@@ -150,15 +193,29 @@ class NoteItemState extends State<NoteItem> {
       case 6:
       case 7:
         {
-          return DateFormat('EEEE').format(dateTime);
+          return DateFormat(Settings.noteItemDateWithinWeekFormat)
+              .format(dateTime);
         }
         break;
 
       default:
         {
-          return DateFormat('dd/MM/yyyy').format(dateTime);
+          return DateFormat(Settings.noteItemDateMoreThanWeekFormat)
+              .format(dateTime);
         }
         break;
+    }
+  }
+
+  Future<void> _shareNote() {
+    if (!widget.demoMode) {
+      widget.onNotePreviewRequested(widget.note, true, true);
+    }
+  }
+
+  void _deleteNote(NotepadDatabase database) {
+    if (!widget.demoMode) {
+      database.deleteNote(widget.note);
     }
   }
 }

@@ -1,66 +1,33 @@
+import 'dart:io';
+
+import 'package:drawablenotepadflutter/const.dart';
+import 'package:drawablenotepadflutter/translations.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:painter/painter.dart';
 
-const alpha = 220;
-const bottomBarHeight = 50.0;
-const undoDisabledColor = Colors.black26;
-
-class DrawThicknessMode {
-  DrawThicknessMode(this.thickness, this.icon);
-
-  double thickness;
-  IconData icon;
-
-}
-
-const defaultThicknessMode = 1;
-List<DrawThicknessMode> _drawThicknessModes = [ //TODO Placeholder icons
-  DrawThicknessMode(2.0, Icons.arrow_right),
-  DrawThicknessMode(5.0, Icons.chevron_right),
-  DrawThicknessMode(10.0, Icons.arrow_forward_ios)
-];
-
-List<Color> _defaultColors = [
-  Colors.red.withAlpha(alpha),
-  Colors.pink.withAlpha(alpha),
-  Colors.purple.withAlpha(alpha),
-  Colors.deepPurple.withAlpha(alpha),
-  Colors.indigo.withAlpha(alpha),
-  Colors.blue.withAlpha(alpha),
-  Colors.lightBlue.withAlpha(alpha),
-  Colors.cyan.withAlpha(alpha),
-  Colors.teal.withAlpha(alpha),
-  Colors.green.withAlpha(alpha),
-  Colors.lightGreen.withAlpha(alpha),
-  Colors.lime.withAlpha(alpha),
-  Colors.yellow.withAlpha(alpha),
-  Colors.amber.withAlpha(alpha),
-  Colors.orange.withAlpha(alpha),
-  Colors.deepOrange.withAlpha(alpha),
-  Colors.brown.withAlpha(alpha),
-  Colors.grey.withAlpha(alpha),
-  Colors.blueGrey.withAlpha(alpha),
-  Colors.black.withAlpha(alpha),
-];
-
 class PaintPicker extends StatefulWidget {
-  PaintPicker(this.painterController, {Key key}) : super(key: key);
+  PaintPicker(this.painterController,
+      {Key key, this.onUpdateNoteSettingsListener})
+      : super(key: key);
 
-  PainterController painterController;
+  final Function onUpdateNoteSettingsListener;
+  final PainterController painterController;
 
   @override
   _PaintPickerState createState() => _PaintPickerState();
 }
 
 class _PaintPickerState extends State<PaintPicker> {
-  bool hasHistory = false;
-  bool eraseMode = false;
-  int currentThicknessMode = defaultThicknessMode;
+  int currentThicknessMode;
 
   void changeColorAndDismissDialog(Color color) {
     setState(() {
       widget.painterController.drawColor = color;
+      widget.painterController.eraseMode = false;
+      widget?.onUpdateNoteSettingsListener?.call();
       Navigator.pop(context);
     });
   }
@@ -68,15 +35,17 @@ class _PaintPickerState extends State<PaintPicker> {
   @override
   void initState() {
     super.initState();
-    hasHistory = widget.painterController.hasHistory();
-    widget.painterController.setOnDrawStepListener(_refreshHistoryState);
+    currentThicknessMode = Settings.drawThicknessModes.indexWhere(
+        (element) => element.thickness == widget.painterController.thickness);
+    widget.painterController.setOnHistoryUpdatedListener(_refreshHistoryState);
   }
 
   @override
   Widget build(BuildContext context) {
-    widget.painterController.thickness = _drawThicknessModes[currentThicknessMode].thickness;
+    widget.painterController.thickness =
+        Settings.drawThicknessModes[currentThicknessMode].thickness;
     return Container(
-      color: Color.fromARGB(255, 224, 224, 224),
+      color: Settings.bottomBarBackgroundColor,
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -89,7 +58,7 @@ class _PaintPickerState extends State<PaintPicker> {
           ],
         ),
       ),
-      height: bottomBarHeight,
+      height: Settings.bottomBarHeight,
     );
   }
 
@@ -97,7 +66,9 @@ class _PaintPickerState extends State<PaintPicker> {
     return FlatButton(
       child: Container(
           child: new PhysicalModel(
-            color: widget.painterController.drawColor,
+            color: widget.painterController.eraseMode
+                ? Colors.white
+                : widget.painterController.drawColor,
             borderRadius: new BorderRadius.circular(25.0),
             child: new Container(
               width: 25.0,
@@ -117,45 +88,63 @@ class _PaintPickerState extends State<PaintPicker> {
   }
 
   _createUndoButton() {
+    bool hasHistory = widget.painterController.hasHistory();
     return FlatButton(
       child: Container(
-          child: Icon(Icons.undo,
-              color: hasHistory ? Colors.black : undoDisabledColor),
-          padding: EdgeInsets.all(12.5)),
+          width: Settings.bottomBarHeight,
+          height: Settings.bottomBarHeight,
+          padding: EdgeInsets.all(12.5),
+          child: SvgPicture.asset(
+            "assets/undo-alt.svg",
+            color: hasHistory ? Colors.black : Settings.undoDisabledColor,
+          )),
       onPressed: hasHistory ? _undoPaintStep : null,
     );
   }
 
   _createEraserButton() {
     return FlatButton(
-      //behavior: HitTestBehavior.translucent,
-      child: Container(child: Icon(Icons.close,
-      color: eraseMode ? Colors.black : undoDisabledColor,), padding: EdgeInsets.all(12.5)),
+      color: widget.painterController.eraseMode
+          ? Settings.activeEraserBackground
+          : null,
+      child: Container(
+          width: Settings.bottomBarHeight,
+          height: Settings.bottomBarHeight,
+          padding: EdgeInsets.all(12.5),
+          child: SvgPicture.asset("assets/eraser.svg")),
       onPressed: _toggleEraseMode,
+      onLongPress: _clearWithAlert,
     );
   }
 
   _createThicknessPickerButton() {
     return FlatButton(
-      child: Container(
-          child: Icon(_drawThicknessModes[currentThicknessMode].icon), padding: EdgeInsets.all(12.5)),
       onPressed: _changeThickness,
+      child: Container(
+          width: Settings.bottomBarHeight,
+          height: Settings.bottomBarHeight,
+          padding: EdgeInsets.all(8),
+          child: SvgPicture.asset(Settings
+              .drawThicknessModes[currentThicknessMode].vectorAssetPath)),
     );
   }
 
   void _showPicker() {
+    setState(() {
+      widget.painterController.eraseMode = false;
+    });
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          child: SingleChildScrollView(
-            child: BlockPicker(
-              pickerColor: widget.painterController.drawColor,
-              onColorChanged: changeColorAndDismissDialog,
-              availableColors: _defaultColors,
-            ),
+          child: BlockPicker(
+            pickerColor: widget.painterController.drawColor,
+            onColorChanged: changeColorAndDismissDialog,
+            availableColors: Settings.paintColors,
+            layoutBuilder: _getColorPickerLayoutBuilder,
+            itemBuilder: _getColorPickerItemBuilder,
           ),
         );
       },
@@ -164,76 +153,153 @@ class _PaintPickerState extends State<PaintPicker> {
 
   void _undoPaintStep() {
     widget.painterController.undo();
+    widget?.onUpdateNoteSettingsListener?.call();
     _refreshHistoryState();
   }
 
   void _toggleEraseMode() {
     widget.painterController.eraseMode = !widget.painterController.eraseMode;
-    setState(() {
-      eraseMode = widget.painterController.eraseMode;
-    });
+    setState(() {});
+  }
+
+  void _clearWithAlert() async {
+    if (Platform.isAndroid) {
+      showMaterialEraseAlertDialog();
+    } else if (Platform.isIOS) {
+      showCupertinoEraseAlertDialog();
+    }
+  }
+
+  void showCupertinoEraseAlertDialog() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text(AppLocalizations.of(context).translate('eraseAlertTitle')),
+          content: Text(AppLocalizations.of(context).translate('eraseAlertContent')),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text(
+                AppLocalizations.of(context).translate('eraseAlertYes'),
+                style: TextStyle(
+                    color: Color.fromARGB(255, 255, 59, 48) // iOS Red color
+                    ),
+              ),
+              onPressed: () async {
+                _clear();
+                Navigator.of(context).pop();
+              },
+            ),
+            CupertinoDialogAction(
+              child: Text(AppLocalizations.of(context).translate('eraseAlertNo')),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showMaterialEraseAlertDialog() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context).translate('eraseAlertTitle')),
+          content: Text(AppLocalizations.of(context).translate('eraseAlertContent')),
+          actions: <Widget>[
+            FlatButton(
+              child: Text(AppLocalizations.of(context).translate('eraseAlertYes').toUpperCase()),
+              onPressed: () async {
+                _clear();
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text(AppLocalizations.of(context).translate('eraseAlertNo').toUpperCase()),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _clear() {
+    widget.painterController.clear();
+    widget.painterController.eraseMode = false;
+    widget?.onUpdateNoteSettingsListener?.call();
+    setState(() {});
   }
 
   void _changeThickness() {
     currentThicknessMode++;
+    widget?.onUpdateNoteSettingsListener?.call();
     setState(() {
-      currentThicknessMode = currentThicknessMode%_drawThicknessModes.length;
-      print('MODE $currentThicknessMode');
+      currentThicknessMode =
+          currentThicknessMode % Settings.drawThicknessModes.length;
     });
   }
 
   void _refreshHistoryState() {
-    setState(() {
-      hasHistory = widget.painterController.hasHistory();
-    });
+    setState(() {});
   }
-}
 
-class MenuItem {
-  const MenuItem({this.title, this.icon});
-
-  final String title;
-  final IconData icon;
-}
-
-/* alternate color picker icon
-  Widget _createColorPickerButton() {
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      child: Container(
-          child: new PhysicalModel(
-            color: widget.painterController.drawColor,
-            borderRadius: new BorderRadius.circular(25.0),
-            child: Stack(children: <Widget>[
-              new Container(
-                width: 25.0,
-                height: 25.0,
-                decoration: new BoxDecoration(
-                  borderRadius: new BorderRadius.circular(12.5),
-                  border: new Border.all(
-                    width: 3.0,
-                    color: Color.fromARGB(255, 224, 224, 224),
-                  ),
-                ),
-              ),
-              new Container(
-                width: 25.0,
-                height: 25.0,
-                decoration: new BoxDecoration(
-                  borderRadius: new BorderRadius.circular(12.5),
-                  border: new Border.all(
-                    width: 1.5,
-                    color: Colors.black,
-                  ),
-                ),
-              )
-            ]),
-          ),
-          padding: EdgeInsets.all(12.5)),
-      onTap: _showPicker,
+  static Widget _getColorPickerLayoutBuilder(
+      BuildContext context, List<Color> colors, PickerItem child) {
+    return Container(
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        direction: Axis.horizontal,
+        children: colors.map((Color color) => child(color)).toList(),
+      ),
     );
-
-    return IconButton(icon: Icon(Icons.color_lens), onPressed: _showPicker);
   }
 
-*/
+  static Widget _getColorPickerItemBuilder(
+      Color color, bool isCurrentColor, Function changeColor) {
+    return Container(
+      width: Settings.colorCircleItemSize,
+      height: Settings.colorCircleItemSize,
+      margin: EdgeInsets.all(5.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(Settings.colorCircleItemSize),
+        color: color,
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.8),
+            offset: Offset(1.0, 2.0),
+            blurRadius: 3.0,
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: changeColor,
+          borderRadius: BorderRadius.circular(Settings.colorCircleItemSize),
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 210),
+            opacity: isCurrentColor ? 1.0 : 0.0,
+            child: Icon(
+              Icons.done,
+              color: useWhiteForeground(color) ? Colors.white : Colors.black,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DrawThicknessMode {
+  DrawThicknessMode(this.thickness, this.vectorAssetPath);
+  double thickness;
+  double vectorPadding;
+  String vectorAssetPath;
+}

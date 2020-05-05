@@ -1,0 +1,20 @@
+{
+  "appTitle": "Drawable Notepad 2",
+  "eraseAlertTitle": "Are you sure?",
+  "eraseAlertContent": "Long pressing erase button will clear the whole drawing",
+  "eraseAlertYes": "Erase",
+  "eraseAlertNo": "Cancel",
+  "notesListRouteToolbarTitle": "Notepad",
+  "noteRouteToolbarTitle": "Note",
+  "addNoteFABTooltip": "Add note",
+  "noteItemDefaultTitle": "New note",
+  "noteItemHandwrittenNoteTitle": "Handwritten Note",
+  "noteItemDefaultAlternativeTitle": "No additional text",
+  "noteItemYesterdayText": "Yesterday",
+  "shareNoteText": "Note from drawable notepad",
+  "searchBarTypeToSearch": "Type to search",
+  "searchBarNotFound": "No notes with \"%s\" text found",
+  "tutorialClickHereToAddNewNote": "Click here to add new note",
+  "tutorialLongPressForPreview": "Long press to show note preview",
+  "tutorialSwipeToShareDelete": "Swipe to share/delete note"
+}

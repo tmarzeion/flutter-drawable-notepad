@@ -1,71 +1,129 @@
-import 'dart:convert';
-
-import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:drawablenotepadflutter/routes/app_navigator.dart';
+import 'package:drawablenotepadflutter/translations.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'views/notes_list.dart';
 
 class ListRoute extends StatefulWidget {
   ListRoute({Key key}) : super(key: key);
 
+  static const String routeName = "ListRoute";
+
   @override
   _ListRouteState createState() => _ListRouteState();
 }
 
 class _ListRouteState extends State<ListRoute> {
-  MenuItem _selectedChoice = mainMenuItems[0];
+  bool searchExpanded = false;
+  NotesList notesList;
+  TextEditingController _searchTextController;
+  FocusNode _focusNode = FocusNode();
 
-  void _select(MenuItem choice) {
-    // Causes the app to rebuild with the new _selectedChoice.
+  final _notesListStateKey = GlobalKey<NotesListState>();
 
-    final database = Provider.of<NotepadDatabase>(context, listen: false);
-    var testDate = new DateTime(2020, 4, 0);
-    database.insertNote(Note(noteText: "SomeTxt ${new DateTime.now().millisecondsSinceEpoch}", noteDate: testDate));
-
-    setState(() {
-      _selectedChoice = choice;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _searchTextController = TextEditingController();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    Widget searchWidget = Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        AnimatedOpacity(
+          duration: Duration(milliseconds: 500),
+          curve: Curves.fastOutSlowIn,
+          opacity: searchExpanded ? 1.0 : 0.0,
+          child: IconButton(
+            padding: EdgeInsets.all(0.0),
+            icon: (Icon(Icons.close, size: 24)),
+            onPressed: _toggleSearch,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+          child: AnimatedContainer(
+              duration: Duration(milliseconds: 500),
+              curve: Curves.fastOutSlowIn,
+              height: 50,
+              width:
+                  searchExpanded ? MediaQuery.of(context).size.width - 48 : 0.0,
+              decoration: new BoxDecoration(
+                  color: Colors.black.withAlpha(50),
+                  borderRadius: new BorderRadius.circular(40.0)),
+              child: TextField(
+                controller: _searchTextController,
+                focusNode: _focusNode,
+                decoration: InputDecoration(
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    contentPadding:
+                        EdgeInsets.only(left: 15, bottom: 7, top: 0, right: 15),
+                    hintText: AppLocalizations.of(context)
+                        .translate('searchBarTypeToSearch')),
+                onChanged: _onSearchQueryChanged,
+              )),
+        ),
+      ],
+    );
+
+    Widget searchIcon = AnimatedOpacity(
+        duration: Duration(milliseconds: 500),
+        curve: Curves.fastOutSlowIn,
+        opacity: !searchExpanded ? 1.0 : 0.0,
+        child: Align(
+            alignment: Alignment.centerRight,
+            child: IconButton(
+              padding: EdgeInsets.all(0.0),
+              icon: Icon(Icons.search),
+              onPressed: () {
+                _toggleSearch();
+              },
+            )));
+
+    notesList = NotesList(
+      key: _notesListStateKey,
+    );
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Notepad"),
+        title: Text(AppLocalizations.of(context)
+            .translate('notesListRouteToolbarTitle')),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(mainMenuItems[0].icon),
-            onPressed: () {
-              _select(mainMenuItems[0]); //TODO TBD
-            },
-          ),
+          Stack(children: <Widget>[searchWidget, searchIcon])
         ],
       ),
-      body: NotesList(),
+      body: notesList,
       floatingActionButton: FloatingActionButton(
-        tooltip: 'Add note',
-        onPressed: () => AppNavigator.navigateToNoteEdit(context, null),
+        tooltip: AppLocalizations.of(context).translate('addNoteFABTooltip'),
+        onPressed: () => AppNavigator.navigateToNoteEdit(context, null, null),
         child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
+
+  void _toggleSearch() {
+    setState(() {
+      searchExpanded = !searchExpanded;
+      _searchTextController.text = "";
+      _onSearchQueryChanged("");
+      if (searchExpanded) {
+        _focusNode.requestFocus();
+      } else {
+        FocusScope.of(context).requestFocus(new FocusNode());
+      }
+    });
+  }
+
+  void _onSearchQueryChanged(String query) {
+    if (_notesListStateKey.currentState != null) {
+      _notesListStateKey.currentState.onQueryTextChanged(query);
+    }
+  }
 }
-
-class MenuItem {
-  const MenuItem({this.title, this.icon});
-
-  final String title;
-  final IconData icon;
-}
-
-const List<MenuItem> mainMenuItems = const <MenuItem>[
-  const MenuItem(title: 'Search', icon: Icons.search),
-];
