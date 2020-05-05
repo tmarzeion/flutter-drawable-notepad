@@ -3,6 +3,7 @@ import 'package:drawablenotepadflutter/routes/init/init_route.dart';
 import 'package:drawablenotepadflutter/routes/intro/intro_route.dart';
 import 'package:drawablenotepadflutter/routes/note/note_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,6 +20,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
 
     return Provider(
       // The single instance of NotepadDatabase
@@ -40,7 +46,7 @@ class MyApp extends StatelessWidget {
           GlobalCupertinoLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
-        title: "Drawble Notepad 2",// AppLocalizations.of(context).translate('appTitle'), //TODO This needs to be translated
+        title: "Notepad",
         theme: ThemeData(
           primarySwatch: Settings.defaultColor, //Default color here
           visualDensity: VisualDensity.adaptivePlatformDensity,

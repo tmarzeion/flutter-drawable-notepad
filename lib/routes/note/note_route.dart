@@ -229,7 +229,7 @@ class _NoteRouteState extends State<NoteRoute>
                 ],
               ),
             ),
-            Container(color: Colors.green, height: _animation?.value ?? 0)
+            Container(color: Colors.transparent, height: _animation?.value ?? 0)
           ],
         ),
       ),

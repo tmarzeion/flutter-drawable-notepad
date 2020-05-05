@@ -3,6 +3,7 @@ import 'package:drawablenotepadflutter/data/notepad_database.dart';
 import 'package:drawablenotepadflutter/routes/app_navigator.dart';
 import 'package:drawablenotepadflutter/routes/intro/intro_samples.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,6 +23,12 @@ class _InitRouteState extends State<InitRoute> {
 
   @override
   Widget build(BuildContext context) {
+
+    SystemChrome.setApplicationSwitcherDescription(ApplicationSwitcherDescription(
+      label: AppLocalizations.of(context).translate('appTitle'),
+      primaryColor: Theme.of(context).primaryColor.value,
+    ));
+
     return Scaffold(
         backgroundColor: Settings.defaultColor,
         body: Stack(
