@@ -56,13 +56,13 @@ class DrawModeController {
   }
 
   toggleFontPicker() {
-    _toggleCloseable(fontPickerKey.currentState);
     hidePaintPicker();
+    _toggleCloseable(fontPickerKey.currentState);
   }
 
   togglePaintPicker() {
-    _toggleCloseable(paintPickerKey.currentState);
     hideFontPicker();
+    _toggleCloseable(paintPickerKey.currentState);
     onToolbarStateChanged?.call();
   }
 

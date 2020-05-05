@@ -43,6 +43,7 @@ class _NoteRouteState extends State<NoteRoute>
 
   // For zefyr
   FocusNode _focusNode;
+  ZefyrScaffold _zefyr;
 
   Timer saveNoteTimer;
 
@@ -91,6 +92,8 @@ class _NoteRouteState extends State<NoteRoute>
     _scrollControllerForText.addListener(() {
       _scrollControllerForPainter.jumpTo(_scrollControllerForText.offset);
     });
+
+    scaffoldZefyr();
   }
 
   // TODO: Provide it via DI
@@ -182,64 +185,51 @@ class _NoteRouteState extends State<NoteRoute>
         body: Column(
           children: <Widget>[
             Expanded(
-              child: GestureDetector(
-                onPanUpdate: _scrollViews,
-                child: Stack(
-                  children: [
-                    // Ugly hack to prevent keyboard from showing on preview mode«
-                    if (widget.previewMode)
-                      Opacity(opacity: 0, child: menuItems[0]),
-                    if (widget.previewMode)
-                      Opacity(opacity: 0, child: menuItems[1]),
-                    IgnorePointer(
+              child: Stack(
+                children: [
+                  // Ugly hack to prevent keyboard from showing on preview mode«
+                  if (widget.previewMode)
+                    Opacity(opacity: 0, child: menuItems[0]),
+                  if (widget.previewMode)
+                    Opacity(opacity: 0, child: menuItems[1]),
+                  IgnorePointer(
+                    ignoring:
+                    shouldIgnoreTextEditorClicks || widget.previewMode,
+                    child: _drawModeController.bottomBarVisible() && !_drawModeController.isDrawMode() ? scaffoldZefyr() : _zefyr,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: bottomPainterPadding),
+                    child: IgnorePointer(
                       ignoring:
-                          shouldIgnoreTextEditorClicks || widget.previewMode,
-                      child: ZefyrScaffold(
-                        child: ZefyrEditor(
-                          scrollController: _scrollControllerForText,
-                          physics: NeverScrollableScrollPhysics(),
-                          padding: EdgeInsets.all(16),
-                          controller: _zefyrController,
-                          focusNode: _focusNode,
+                      shouldIgnorePainterClicks || widget.previewMode,
+                      child: SingleChildScrollView(
+                        physics: NeverScrollableScrollPhysics(),
+                        controller: _scrollControllerForPainter,
+                        child: Container(
+                          height: 1920,
+                          child: Opacity(
+                              opacity: 0.6,
+                              child: Painter(_painterController)),
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(bottom: bottomPainterPadding),
-                      child: IgnorePointer(
-                        ignoring:
-                            shouldIgnorePainterClicks || widget.previewMode,
-                        child: SingleChildScrollView(
-                          physics: NeverScrollableScrollPhysics(),
-                          controller: _scrollControllerForPainter,
-                          child: Container(
-                            height: 1920,
-                            child: Opacity(
-                                opacity: 0.6,
-                                child: Painter(_painterController)),
-                          ),
-                        ),
-                      ),
+                  ),
+                  Visibility(
+                    visible:
+                    shouldIgnoreTextEditorClicks && !widget.previewMode,
+                    child: Align(
+                      alignment: AlignmentDirectional.bottomCenter,
+                      child: Container(
+                          height: Settings.bottomBarHeight,
+                          child: PaintPicker(_painterController,
+                              onUpdateNoteSettingsListener:
+                              startSaveNoteTimer)),
                     ),
-                    Visibility(
-                      visible:
-                          shouldIgnoreTextEditorClicks && !widget.previewMode,
-                      child: Expanded(
-                        child: Align(
-                          alignment: AlignmentDirectional.bottomCenter,
-                          child: Container(
-                              height: Settings.bottomBarHeight,
-                              child: PaintPicker(_painterController,
-                                  onUpdateNoteSettingsListener:
-                                      startSaveNoteTimer)),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
+                  )
+                ],
               ),
             ),
-            Container(color: Colors.transparent, height: _animation?.value ?? 0)
+            Container(color: Colors.green, height: _animation?.value ?? 0)
           ],
         ),
       ),
@@ -248,12 +238,16 @@ class _NoteRouteState extends State<NoteRoute>
     return view;
   }
 
-  void _scrollViews(DragUpdateDetails details) {
-    final newPos = _scrollControllerForText.offset - details.delta.dy;
-    if (newPos > 0) {
-      _scrollControllerForText
-          .jumpTo(_scrollControllerForText.offset - details.delta.dy);
-    }
+  ZefyrScaffold scaffoldZefyr() {
+    _zefyr = ZefyrScaffold(
+      child: ZefyrEditor(
+        scrollController: _scrollControllerForText,
+        padding: EdgeInsets.all(16),
+        controller: _zefyrController,
+        focusNode: _focusNode,
+      ),
+    );
+    return _zefyr;
   }
 
   Future<bool> _onWillPop() async {
@@ -284,7 +278,7 @@ class _NoteRouteState extends State<NoteRoute>
               noteText: noteText,
               notePlainText: _zefyrController.document.toPlainText(),
               paths: paintHistory == null ? "[]" : paintHistory,
-              noteSettings: _getCurrentNoteSettings());
+              noteSettings: noteSettings);
           database.updateNote(newNote);
           widget.note = newNote;
         }
@@ -293,7 +287,7 @@ class _NoteRouteState extends State<NoteRoute>
             noteText: noteText,
             notePlainText: _zefyrController.document.toPlainText(),
             noteDate: new DateTime.now(),
-            noteSettings: _getCurrentNoteSettings(),
+            noteSettings: noteSettings,
             paths: paintHistory);
         var noteId = await database.insertNote(newNote);
         widget.note = newNote.copyWith(id: noteId);

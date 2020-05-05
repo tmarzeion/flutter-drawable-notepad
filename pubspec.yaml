@@ -42,7 +42,7 @@ dependencies:
     git:
       url: git://github.com/tmarzeion/zefyr.git
       path: packages/zefyr/
-      ref: 7ab3e971b353b6f69445da4edd31795ae079efaf
+      ref: a7bebaa52b833ce5a4cb24b44a182189965127ab
   painter:
     git:
       url: git://github.com/tmarzeion/painter.git
