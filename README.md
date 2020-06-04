@@ -1,6 +1,7 @@
 # Drawable Notepad 2
 [![Codemagic build status](https://api.codemagic.io/apps/5e9ea4ef23fafc18149bd52a/5e9ea4ef23fafc18149bd529/status_badge.svg)](https://codemagic.io/apps/5e9ea4ef23fafc18149bd52a/5e9ea4ef23fafc18149bd529/latest_build)
 
+[![Available on play store](https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png)](https://play.google.com/store/apps/details?id=com.tmarzeion.drawablenotepadflutter)
 
 Flutter reimplementation of existing [Drawable Notepad App](https://github.com/tmarzeion/drawable-notepad)
 
