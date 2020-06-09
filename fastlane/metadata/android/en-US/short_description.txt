@@ -1,0 +1,1 @@
+Simple notepad that allows user to make notes and draw on them.

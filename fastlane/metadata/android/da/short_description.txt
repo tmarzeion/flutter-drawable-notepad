@@ -1,0 +1,2 @@
+Notepad that allows user to make notes and draw on them.
+Available in Danish!

@@ -1,0 +1,11 @@
+Features:
+- Rich-text editor
+- Drawing on notes
+- Saving/Updating/Removing notes
+- Saving notes on-fly
+- Draw mode setting bar state persistance
+- Saved setting of draw/text modes
+- Long press on note item -> Modal preview
+- Share feature
+- Interactive intro screen
+- Search feature

@@ -1,0 +1,1 @@
+Notatnik pozwalający na tworzenie notatek i rysowanie po nich.

@@ -1,0 +1,11 @@
+Zawiera:
+- Edytor tekstu
+- Funkcję rysowania
+- Zapisywanie/Usuwanie notatek
+- Zapisywanie notatek w locie
+- Zapamiętywanie ustawień rysowania
+- Zapamiętywanie trybu
+- Podgląd notatki przy długim przytrzymaniu na liście
+- Udostępnianie notatek
+- Interaktywny ekran wprowadzający
+- Funkcja szukania
